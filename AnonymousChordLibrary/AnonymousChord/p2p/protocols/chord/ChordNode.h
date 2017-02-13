@@ -1,3 +1,13 @@
+/*
+*  ChordNode.h
+*  iPhone_p2p_engine
+*
+*  Created by Laurent Vanni & Nicolas Goles Domic, 2010
+*
+*	This class is the implementation of the "Chord" class,
+*	it inherits from the Chord abstract class and implements
+*	it's abstract methods.
+*/
 
 #ifndef CHORDNODE_H
 #define CHORDNODE_H
@@ -13,16 +23,16 @@ class Stabilization;
 
 using namespace std;
 
-class ChordNode: public AbstractChord {
+class ChordNode : public AbstractChord {
 public:
 	/* Constructor & Destructor */
 	ChordNode(const string &ip, int port, const string &overlayIdentifier,
-			const string &rootDirectory);
+		const string &rootDirectory);
 	~ChordNode();
 
 	/* Setters */
 	void setIdentifier(const string &iD) { overlayIdentifier = iD; }
-	void setTransport(TransportHTTP *t)  { transport = t; }
+	void setTransport(TransportHTTP *t) { transport = t; }
 
 	/* Action Methods */
 	virtual string sendRequest(Request *request, Node* destination);
@@ -50,9 +60,9 @@ public:
 	/* tools methods */
 	unsigned int   getIntSHA1(string key);
 	char *getHexSHA1(string str);
-	string getIdentifier() 			{ return overlayIdentifier; }
-	TransportHTTP* getTransport()   { return transport; }
-	Node* getThisNode() 			{ return thisNode; }
+	string getIdentifier() { return overlayIdentifier; }
+	TransportHTTP* getTransport() { return transport; }
+	Node* getThisNode() { return thisNode; }
 
 	/* the transport layer */
 	TransportHTTP* transport;
