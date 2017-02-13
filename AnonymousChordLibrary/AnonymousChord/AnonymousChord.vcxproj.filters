@@ -1,0 +1,227 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Source Files\p2p">
+      <UniqueIdentifier>{d83baa2b-09b9-4c84-85c3-5c457ab6aa5e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\helper">
+      <UniqueIdentifier>{56479e8b-b9be-4329-925e-8e4a2fecd6c8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\p2p\node">
+      <UniqueIdentifier>{c17fdd2c-7e3b-4a0b-aa84-71effdd7c0bc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\p2p\protocols">
+      <UniqueIdentifier>{27702317-fe8d-45c1-9961-2d4344b8c87e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\p2p\transport">
+      <UniqueIdentifier>{01f4c2da-6c52-42d4-97a8-5a1c6266e72c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\p2p\transport\http">
+      <UniqueIdentifier>{413628e5-fe6f-43db-8476-779ac60c9ac2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\p2p\protocols\chord">
+      <UniqueIdentifier>{13bcda34-07df-4b24-80e1-9bc0db5e5c79}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\helper\thread">
+      <UniqueIdentifier>{54b3a9da-7f1b-4b40-b91b-8d7347c81bbe}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\helper\request">
+      <UniqueIdentifier>{d97529c9-4909-425a-9d83-4848cb1e4fe3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\helper\mongoose_http_server">
+      <UniqueIdentifier>{9e29b256-2428-4852-bdcf-9c8648fa21e1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\helper\mongoose_http_server\callback">
+      <UniqueIdentifier>{37335e81-2da0-4df7-a863-97a37f75607d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\helper\crypto">
+      <UniqueIdentifier>{e3d6df3a-b93c-4204-be55-c225801399be}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\helper\crypto\tomcrypt">
+      <UniqueIdentifier>{43e26faa-abd6-47a0-b3b4-35915a5f18dc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\helper\crypto\tomcrypt\headers">
+      <UniqueIdentifier>{a94100a2-2555-464d-b8b7-9b902e70fa88}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\helper\crypto\tomcrypt\algorithms">
+      <UniqueIdentifier>{f8922091-d0a8-41a1-9efd-0c2b4dc529e0}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="p2p\transport\IOverlay.h">
+      <Filter>Source Files\p2p\transport</Filter>
+    </ClInclude>
+    <ClInclude Include="p2p\transport\IRequestHandler.h">
+      <Filter>Source Files\p2p\transport</Filter>
+    </ClInclude>
+    <ClInclude Include="p2p\transport\ITransport.h">
+      <Filter>Source Files\p2p\transport</Filter>
+    </ClInclude>
+    <ClInclude Include="p2p\transport\http\http_operations.h">
+      <Filter>Source Files\p2p\transport\http</Filter>
+    </ClInclude>
+    <ClInclude Include="p2p\transport\http\TransportHTTP.h">
+      <Filter>Source Files\p2p\transport\http</Filter>
+    </ClInclude>
+    <ClInclude Include="p2p\protocols\ProtocolSingleton.h">
+      <Filter>Source Files\p2p\protocols</Filter>
+    </ClInclude>
+    <ClInclude Include="p2p\protocols\chord\AbstractChord.h">
+      <Filter>Source Files\p2p\protocols\chord</Filter>
+    </ClInclude>
+    <ClInclude Include="p2p\protocols\chord\ChordNode.h">
+      <Filter>Source Files\p2p\protocols\chord</Filter>
+    </ClInclude>
+    <ClInclude Include="p2p\protocols\chord\ChordTransportCode.h">
+      <Filter>Source Files\p2p\protocols\chord</Filter>
+    </ClInclude>
+    <ClInclude Include="p2p\node\Node.h">
+      <Filter>Source Files\p2p\node</Filter>
+    </ClInclude>
+    <ClInclude Include="helper\HTTP_Client.h">
+      <Filter>Source Files\helper</Filter>
+    </ClInclude>
+    <ClInclude Include="helper\thread\CheckPred.h">
+      <Filter>Source Files\helper\thread</Filter>
+    </ClInclude>
+    <ClInclude Include="helper\thread\Exception.h">
+      <Filter>Source Files\helper\thread</Filter>
+    </ClInclude>
+    <ClInclude Include="helper\thread\FixFinger.h">
+      <Filter>Source Files\helper\thread</Filter>
+    </ClInclude>
+    <ClInclude Include="helper\thread\Stabilization.h">
+      <Filter>Source Files\helper\thread</Filter>
+    </ClInclude>
+    <ClInclude Include="helper\thread\Thread.h">
+      <Filter>Source Files\helper\thread</Filter>
+    </ClInclude>
+    <ClInclude Include="helper\thread\TimeHelper.h">
+      <Filter>Source Files\helper\thread</Filter>
+    </ClInclude>
+    <ClInclude Include="helper\request\Request.h">
+      <Filter>Source Files\helper\request</Filter>
+    </ClInclude>
+    <ClInclude Include="helper\mongoose_http_server\mongoose.h">
+      <Filter>Source Files\helper\mongoose_http_server</Filter>
+    </ClInclude>
+    <ClInclude Include="helper\mongoose_http_server\MongooseDaemon.h">
+      <Filter>Source Files\helper\mongoose_http_server</Filter>
+    </ClInclude>
+    <ClInclude Include="helper\mongoose_http_server\callbacks\callbacks.h">
+      <Filter>Source Files\helper\mongoose_http_server\callback</Filter>
+    </ClInclude>
+    <ClInclude Include="helper\mongoose_http_server\callbacks\chord_callbacks.h">
+      <Filter>Source Files\helper\mongoose_http_server\callback</Filter>
+    </ClInclude>
+    <ClInclude Include="helper\crypto\sha1.h">
+      <Filter>Source Files\helper\crypto</Filter>
+    </ClInclude>
+    <ClInclude Include="helper\crypto\tomcrypt\headers\tomcrypt.h">
+      <Filter>Source Files\helper\crypto\tomcrypt\headers</Filter>
+    </ClInclude>
+    <ClInclude Include="helper\crypto\tomcrypt\headers\tomcrypt_argchk.h">
+      <Filter>Source Files\helper\crypto\tomcrypt\headers</Filter>
+    </ClInclude>
+    <ClInclude Include="helper\crypto\tomcrypt\headers\tomcrypt_cfg.h">
+      <Filter>Source Files\helper\crypto\tomcrypt\headers</Filter>
+    </ClInclude>
+    <ClInclude Include="helper\crypto\tomcrypt\headers\tomcrypt_cipher.h">
+      <Filter>Source Files\helper\crypto\tomcrypt\headers</Filter>
+    </ClInclude>
+    <ClInclude Include="helper\crypto\tomcrypt\headers\tomcrypt_custom.h">
+      <Filter>Source Files\helper\crypto\tomcrypt\headers</Filter>
+    </ClInclude>
+    <ClInclude Include="helper\crypto\tomcrypt\headers\tomcrypt_hash.h">
+      <Filter>Source Files\helper\crypto\tomcrypt\headers</Filter>
+    </ClInclude>
+    <ClInclude Include="helper\crypto\tomcrypt\headers\tomcrypt_mac.h">
+      <Filter>Source Files\helper\crypto\tomcrypt\headers</Filter>
+    </ClInclude>
+    <ClInclude Include="helper\crypto\tomcrypt\headers\tomcrypt_macros.h">
+      <Filter>Source Files\helper\crypto\tomcrypt\headers</Filter>
+    </ClInclude>
+    <ClInclude Include="helper\crypto\tomcrypt\headers\tomcrypt_math.h">
+      <Filter>Source Files\helper\crypto\tomcrypt\headers</Filter>
+    </ClInclude>
+    <ClInclude Include="helper\crypto\tomcrypt\headers\tomcrypt_misc.h">
+      <Filter>Source Files\helper\crypto\tomcrypt\headers</Filter>
+    </ClInclude>
+    <ClInclude Include="helper\crypto\tomcrypt\headers\tomcrypt_pk.h">
+      <Filter>Source Files\helper\crypto\tomcrypt\headers</Filter>
+    </ClInclude>
+    <ClInclude Include="helper\crypto\tomcrypt\headers\tomcrypt_pkcs.h">
+      <Filter>Source Files\helper\crypto\tomcrypt\headers</Filter>
+    </ClInclude>
+    <ClInclude Include="helper\crypto\tomcrypt\headers\tomcrypt_prng.h">
+      <Filter>Source Files\helper\crypto\tomcrypt\headers</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="p2p\transport\http\http_operations.cpp">
+      <Filter>Source Files\p2p\transport\http</Filter>
+    </ClCompile>
+    <ClCompile Include="p2p\transport\http\TransportHTTP.cpp">
+      <Filter>Source Files\p2p\transport\http</Filter>
+    </ClCompile>
+    <ClCompile Include="p2p\protocols\ProtocolSingleton.cpp">
+      <Filter>Source Files\p2p\protocols</Filter>
+    </ClCompile>
+    <ClCompile Include="p2p\protocols\chord\AbstractChord.cpp">
+      <Filter>Source Files\p2p\protocols\chord</Filter>
+    </ClCompile>
+    <ClCompile Include="p2p\protocols\chord\ChordNode.cpp">
+      <Filter>Source Files\p2p\protocols\chord</Filter>
+    </ClCompile>
+    <ClCompile Include="p2p\node\Node.cpp">
+      <Filter>Source Files\p2p\node</Filter>
+    </ClCompile>
+    <ClCompile Include="helper\HTTP_Client.cpp">
+      <Filter>Source Files\helper</Filter>
+    </ClCompile>
+    <ClCompile Include="helper\thread\Thread.cpp">
+      <Filter>Source Files\helper\thread</Filter>
+    </ClCompile>
+    <ClCompile Include="helper\request\Request.cpp">
+      <Filter>Source Files\helper\request</Filter>
+    </ClCompile>
+    <ClCompile Include="helper\mongoose_http_server\mongoose.cpp">
+      <Filter>Source Files\helper\mongoose_http_server</Filter>
+    </ClCompile>
+    <ClCompile Include="helper\mongoose_http_server\callbacks\callbacks.cpp">
+      <Filter>Source Files\helper\mongoose_http_server\callback</Filter>
+    </ClCompile>
+    <ClCompile Include="helper\mongoose_http_server\callbacks\chord_callbacks.cpp">
+      <Filter>Source Files\helper\mongoose_http_server\callback</Filter>
+    </ClCompile>
+    <ClCompile Include="helper\crypto\sha1.cpp">
+      <Filter>Source Files\helper\crypto</Filter>
+    </ClCompile>
+    <ClCompile Include="helper\crypto\tomcrypt\algorithms\crypt_argchk.c">
+      <Filter>Source Files\helper\crypto\tomcrypt\algorithms</Filter>
+    </ClCompile>
+    <ClCompile Include="helper\crypto\tomcrypt\algorithms\md5.c">
+      <Filter>Source Files\helper\crypto\tomcrypt\algorithms</Filter>
+    </ClCompile>
+    <ClCompile Include="helper\crypto\tomcrypt\algorithms\sha1.c">
+      <Filter>Source Files\helper\crypto\tomcrypt\algorithms</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="helper\mongoose_http_server\MongooseDaemon.mm">
+      <Filter>Source Files\helper\mongoose_http_server</Filter>
+    </None>
+  </ItemGroup>
+</Project>
