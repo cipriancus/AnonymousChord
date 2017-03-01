@@ -22,6 +22,7 @@ public:
 	Node(const string &inIp, unsigned int inId, unsigned int inPort);
 	Node(const string &ip, unsigned int port);
 	Node(const string &data);
+        Node(const string &inIp, unsigned int inId, unsigned int inPort,string inSignature);
 
 	bool	equals(Node *node);
 	string	toString();
@@ -38,8 +39,10 @@ public:
 	void			setNid(unsigned int n) { nid = n; }
 	int				getPort() { return port; }
 	void			setPort(int inPort){ port = inPort; }
-
+        string                  getSignature() {return signature;}
+        void                    setSignature(string signature){this->signature=signature;}
 private:
+        string signature;
 	string			ip;
 	unsigned int	nid; //node id (nid), "id" is reserved keyword in Cocoa.
 	string			nidS;

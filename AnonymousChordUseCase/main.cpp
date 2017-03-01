@@ -11,8 +11,8 @@ using namespace std;
 int main(int argc, char * const argv[]) 
 {
 	string backBone[] = {
-			// user backbone
-            "127.0.0.1",
+			// first node, CA
+            "192.168.0.100",
 	};
 	
     Node *chord = NULL;
@@ -20,7 +20,7 @@ int main(int argc, char * const argv[])
 
 	if (argc >= 4) {
 		// Create a test node
-		node = P_SINGLETON->initChordNode(std::string(argv[1]), atoi(argv[2]), std::string("chordTestBed"), std::string(argv[3]));
+		node = P_SINGLETON->initChordNode(std::string(argv[1]), atoi(argv[2]), std::string("AnonymousChord"), std::string(argv[3]));
         chord = NULL;
         
 		// join to an existing chord
@@ -28,7 +28,11 @@ int main(int argc, char * const argv[])
 			cout << "joining...\n";
 			int i = 0;
 		    chord = new Node(backBone[0], 8000);
-			node->join(chord);
+                    node->join(chord);
+                    if(node->getSignatureFromCA(chord)!=true){
+                        exit(1);
+                    }//take signature from CA
+                    //cout<<node->verifyNodeSignature(node->getThisNode(),string("da"),chord);
 		}
 
 		char entry[256];

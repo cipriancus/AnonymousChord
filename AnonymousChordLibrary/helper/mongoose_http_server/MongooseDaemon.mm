@@ -111,6 +111,10 @@
 	mg_set_uri_callback(ctx, "/get", &call_chord_get, NULL);
 	mg_set_uri_callback(ctx, "/setsucc", &call_chord_setsucc, NULL);
 	mg_set_uri_callback(ctx, "/setpred", &call_chord_setpred, NULL);
+        mg_set_uri_callback(ctx, "/signod", &call_chord_signod, NULL);
+        mg_set_uri_callback(ctx, "/verify", &call_chord_signod, NULL);
+
+
 }
 
 - (void)startMongooseDaemon:(NSString *)ports;

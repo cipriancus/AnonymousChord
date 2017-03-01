@@ -112,6 +112,58 @@ void call_chord_get(struct mg_connection *conn,
 	//Release the allocated memory for id variable.
 	mg_free(key);
 }
+//calls for a digital signature
+void call_chord_signod(struct mg_connection *conn,const struct mg_request_info *request_info, void *user_data) {
+	string result;
+	char *ip  = NULL;
+	char *port = NULL;
+	char *nid  = NULL;
+
+        
+	assert((ip = mg_get_var(conn, "ip")) != NULL);
+        assert((port = mg_get_var(conn, "port")) != NULL);
+	assert((nid = mg_get_var(conn, "nid")) != NULL);
+        assert(P_SINGLETON->getMode().compare("CA")==0);
+          
+	result = P_SINGLETON->getCA()->signNode(string(ip),atoi(port),atoi(nid));
+        
+	mg_printf(conn, result.c_str());
+
+	//Release the allocated memory for id variable.
+	mg_free(ip);
+        mg_free(port);
+	mg_free(nid);
+
+}
+//cals for a node signature verification
+void call_chord_sigverify(struct mg_connection *conn,const struct mg_request_info *request_info, void *user_data) {
+	string result;
+	char *ip  = NULL;
+	char *port = NULL;
+	char *nid  = NULL;
+	char *signature  = NULL;
+
+        
+	assert((ip = mg_get_var(conn, "ip")) != NULL);
+        assert((port = mg_get_var(conn, "port")) != NULL);
+	assert((nid = mg_get_var(conn, "nid")) != NULL);
+        assert((signature = mg_get_var(conn, "signature")) != NULL);
+        assert(P_SINGLETON->getMode().compare("CA")==0);
+          
+	if(P_SINGLETON->getCA()->verifyNode(string(ip),atoi(port),atoi(nid),signature)==1){
+            result=string("true");
+        }else{
+            result=string("false");
+        }
+            
+        mg_printf(conn, result.c_str());
+
+	//Release the allocated memory for id variable.
+	mg_free(ip);
+        mg_free(port);
+	mg_free(nid);
+
+}
 
 /*
  *	/get callback, handles a get peer request.
@@ -134,7 +186,6 @@ void call_chord_removekey(struct mg_connection *conn,
 void call_chord_setsucc(struct mg_connection *conn,
 		const struct mg_request_info *request_info, void *user_data) {
 	char *n = NULL;
-	//assert(mg_get_var(conn, "overlay_id") != NULL); <== NEEDS TO BE DONE BEFORE!!! XD
 	assert((n = mg_get_var(conn, "successor")) != NULL);
 
 	Node *node = new Node(n);

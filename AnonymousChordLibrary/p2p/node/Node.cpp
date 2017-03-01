@@ -25,6 +25,19 @@ Node::Node(const string &inIp, unsigned int inId, unsigned int inPort) {
 	nidS = string(nidBuffer);
 }
 
+
+Node::Node(const string &inIp, unsigned int inId, unsigned int inPort,string inSignature) {
+	ip = inIp;
+	nid = inId;
+	port = inPort;
+        signature=inSignature;
+        
+	//Transform the nid into a string for later usage.
+	char nidBuffer[255];
+	sprintf(nidBuffer, "%d", nid);
+	nidS = string(nidBuffer);
+}
+
 Node::Node(const string &inIp, unsigned int inPort) {
 	ip = inIp;
 	nid = 0;

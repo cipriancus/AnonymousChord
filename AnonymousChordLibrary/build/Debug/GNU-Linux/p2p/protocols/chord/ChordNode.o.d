@@ -7,7 +7,8 @@ build/Debug/GNU-Linux/p2p/protocols/chord/ChordNode.o: \
  helper/mongoose_http_server/mongoose.h helper/thread/Stabilization.h \
  helper/thread/Thread.h helper/thread/Exception.h \
  p2p/protocols/chord/ChordNode.h p2p/protocols/ProtocolSingleton.h \
- helper/thread/CheckPred.h helper/thread/FixFinger.h \
+ p2p/protocols/ca/CertificationAuthority.h helper/thread/CheckPred.h \
+ helper/thread/FixFinger.h \
  helper/mongoose_http_server/callbacks/callbacks.h \
  p2p/protocols/chord/AbstractChord.h \
  helper/mongoose_http_server/callbacks/chord_callbacks.h \
@@ -43,6 +44,8 @@ helper/thread/Exception.h:
 p2p/protocols/chord/ChordNode.h:
 
 p2p/protocols/ProtocolSingleton.h:
+
+p2p/protocols/ca/CertificationAuthority.h:
 
 helper/thread/CheckPred.h:
 

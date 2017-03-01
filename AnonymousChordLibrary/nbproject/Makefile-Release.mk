@@ -48,6 +48,7 @@ OBJECTFILES= \
 	${OBJECTDIR}/helper/thread/Thread.o \
 	${OBJECTDIR}/p2p/node/Node.o \
 	${OBJECTDIR}/p2p/protocols/ProtocolSingleton.o \
+	${OBJECTDIR}/p2p/protocols/ca/CertificationAuthority.o \
 	${OBJECTDIR}/p2p/protocols/chord/AbstractChord.o \
 	${OBJECTDIR}/p2p/protocols/chord/ChordNode.o \
 	${OBJECTDIR}/p2p/transport/http/TransportHTTP.o \
@@ -144,6 +145,11 @@ ${OBJECTDIR}/p2p/protocols/ProtocolSingleton.o: p2p/protocols/ProtocolSingleton.
 	${MKDIR} -p ${OBJECTDIR}/p2p/protocols
 	${RM} "$@.d"
 	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/p2p/protocols/ProtocolSingleton.o p2p/protocols/ProtocolSingleton.cpp
+
+${OBJECTDIR}/p2p/protocols/ca/CertificationAuthority.o: p2p/protocols/ca/CertificationAuthority.cpp
+	${MKDIR} -p ${OBJECTDIR}/p2p/protocols/ca
+	${RM} "$@.d"
+	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/p2p/protocols/ca/CertificationAuthority.o p2p/protocols/ca/CertificationAuthority.cpp
 
 ${OBJECTDIR}/p2p/protocols/chord/AbstractChord.o: p2p/protocols/chord/AbstractChord.cpp
 	${MKDIR} -p ${OBJECTDIR}/p2p/protocols/chord

@@ -6,6 +6,8 @@
  *
  */
 
+#include <cstring>
+
 #include "ProtocolSingleton.h"
 
 ProtocolSingleton* ProtocolSingleton::instance = NULL;
@@ -32,13 +34,23 @@ ProtocolSingleton* ProtocolSingleton::getInstance() {
 //Initializes a ChordNode from the given parameters.
 ChordNode* ProtocolSingleton::initChordNode(const string &ip, int port,
 		const string &overlayIntifier,
-		const string &rootDirectory) {
-	myNode = new ChordNode(ip, port, overlayIntifier, rootDirectory);
-
-	return myNode;
+		const string &rootDirectory) {  
+        mode=string("NODE");
+        myNode = new ChordNode(ip, port, overlayIntifier, rootDirectory);
+	return myNode;    
 }
 
 void ProtocolSingleton::stopChord() {
-	delete myNode;
-	myNode = NULL;
+	delete myCA;
+	myCA = NULL;
+}
+
+//Initializes a ChordNode from the given parameters.
+CertificationAuthority* ProtocolSingleton::initCA(const string &ip, int port,
+		const string &overlayIntifier,
+		const string &rootDirectory) {  
+        mode=string("CA");
+        myCA = new CertificationAuthority(ip, port, overlayIntifier, rootDirectory);
+        myNode = myCA->getChordNode();
+	return myCA;    
 }

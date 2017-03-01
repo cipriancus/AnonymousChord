@@ -51,6 +51,47 @@ Node* AbstractChord::findSuccessor(int id) {
 	return new Node(succ);
 }
 
+
+bool AbstractChord::getSignatureFromCA(Node* CA) {
+	if (CA!=NULL){
+        std::ostringstream oss;
+	oss << this->getThisNode()->getPort();
+        
+	//Create a request.
+            Request *request = new Request(this->getIdentifier(), SIGNOD);
+            request->addArg("ip", this->getThisNode()->getIp());
+            request->addArg("port", oss.str());
+            request->addArg("nid", this->getThisNode()->getIdString());
+
+            string signature = sendRequest(request, CA);
+            this->getThisNode()->setSignature(signature);
+
+            return true;
+        }
+        return false;
+}
+
+bool AbstractChord::verifyNodeSignature(Node* node, string signature, Node* CA) {
+	if (CA!=NULL){
+        std::ostringstream oss;
+	oss <<node->getPort();
+        
+	//Create a request.
+            Request *request = new Request(this->getIdentifier(), SIGVERIFY);
+            request->addArg("ip", node->getIp());
+            request->addArg("port", oss.str());
+            request->addArg("nid", node->getIdString());
+            request->addArg("signature", signature);
+
+            string response = sendRequest(request, CA);
+            
+            if(response.compare("true")==0)
+                return true;
+            return false;
+        }
+        return false;
+}
+
 Node* AbstractChord::closestPrecedingNode(int nid) {
 	// optimization
 	if (thisNode == successor) {

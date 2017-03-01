@@ -89,6 +89,12 @@ string Request::serialize() {
 	case SETPRED:
 		callback = new string("/setpred");
 		break;
+        case SIGNOD:
+		callback = new string("/signod");
+		break;
+         case SIGVERIFY:
+		callback = new string("/sigverify");
+		break;
 	default:
 		cout << " UNHANDLED CHORD TRANSPORT CODE! ... ASSERTING" << endl;
 		assert(this->getCode());

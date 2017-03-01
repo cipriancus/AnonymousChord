@@ -10,7 +10,7 @@ build/Debug/GNU-Linux/helper/mongoose_http_server/callbacks/callbacks.o: \
  p2p/protocols/chord/ChordTransportCode.h \
  p2p/protocols/ProtocolSingleton.h p2p/protocols/chord/ChordNode.h \
  p2p/protocols/chord/AbstractChord.h p2p/transport/http/TransportHTTP.h \
- p2p/transport/ITransport.h
+ p2p/transport/ITransport.h p2p/protocols/ca/CertificationAuthority.h
 
 helper/mongoose_http_server/callbacks/callbacks.h:
 
@@ -45,3 +45,5 @@ p2p/protocols/chord/AbstractChord.h:
 p2p/transport/http/TransportHTTP.h:
 
 p2p/transport/ITransport.h:
+
+p2p/protocols/ca/CertificationAuthority.h:

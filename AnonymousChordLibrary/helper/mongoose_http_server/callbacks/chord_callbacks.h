@@ -43,6 +43,11 @@ void call_chord_hash(struct mg_connection *conn,
 		const struct mg_request_info *request_info, void *user_data);
 
 void call_chord_shutdown(struct mg_connection *conn,
-					 const struct mg_request_info *request_info, void *user_data);
+		const struct mg_request_info *request_info, void *user_data);
+void call_chord_signod(struct mg_connection *conn,
+                const struct mg_request_info *request_info, void *user_data) ;
+
+void call_chord_sigverify(struct mg_connection *conn,
+                const struct mg_request_info *request_info, void *user_data);
 
 #endif

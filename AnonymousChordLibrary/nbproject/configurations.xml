@@ -75,6 +75,10 @@
           <itemPath>p2p/node/Node.h</itemPath>
         </logicalFolder>
         <logicalFolder name="protocols" displayName="protocols" projectFiles="true">
+          <logicalFolder name="ca" displayName="ca" projectFiles="true">
+            <itemPath>p2p/protocols/ca/CertificationAuthority.cpp</itemPath>
+            <itemPath>p2p/protocols/ca/CertificationAuthority.h</itemPath>
+          </logicalFolder>
           <logicalFolder name="chord" displayName="chord" projectFiles="true">
             <itemPath>p2p/protocols/chord/AbstractChord.cpp</itemPath>
             <itemPath>p2p/protocols/chord/AbstractChord.h</itemPath>
@@ -135,6 +139,7 @@
             <pElem>p2p/protocols/chord</pElem>
             <pElem>p2p/transport/http</pElem>
             <pElem>p2p/transport</pElem>
+            <pElem>p2p/protocols/ca</pElem>
           </incDir>
           <commandLine>-lrt -ldl -lpthread</commandLine>
         </ccTool>
@@ -297,6 +302,16 @@
             flavor2="0">
       </item>
       <item path="p2p/protocols/ProtocolSingleton.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="p2p/protocols/ca/CertificationAuthority.cpp"
+            ex="false"
+            tool="1"
+            flavor2="0">
+      </item>
+      <item path="p2p/protocols/ca/CertificationAuthority.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
       </item>
       <item path="p2p/protocols/chord/AbstractChord.cpp"
             ex="false"
@@ -517,6 +532,16 @@
             flavor2="0">
       </item>
       <item path="p2p/protocols/ProtocolSingleton.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="p2p/protocols/ca/CertificationAuthority.cpp"
+            ex="false"
+            tool="1"
+            flavor2="0">
+      </item>
+      <item path="p2p/protocols/ca/CertificationAuthority.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
       </item>
       <item path="p2p/protocols/chord/AbstractChord.cpp"
             ex="false"

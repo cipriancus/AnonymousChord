@@ -42,9 +42,16 @@ public:
 	
 	/* Display */
 	string toString();
+        
+        string                  getSignature() {return signature;}
+        void                    setSignature(string signature){this->signature=signature;}
 
 	/* Getters & Setters */
 	Node*	getThisNode() { return thisNode; }
+        
+        bool    getSignatureFromCA(Node* CA);
+        bool    verifyNodeSignature(Node* node,string signature,Node* CA);
+
 	
 	Node*	getSuccessor(){ return successor; }
 	void	setSuccessor(Node *n) { successor = n; }
@@ -82,6 +89,8 @@ protected:
 	/** index of the next finger */
 	int next;
 	
+        string signature;
+
 	/** Time between each stabilization/fix fingerstable */
 	int timeToCheck;
 };

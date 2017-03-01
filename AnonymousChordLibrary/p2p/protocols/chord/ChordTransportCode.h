@@ -19,7 +19,9 @@ typedef enum {
 	REMOVEKEY,
 	SETSUCC,
 	SETPRED,
-	CHECKPRED
+	CHECKPRED,
+        SIGNOD,
+        SIGVERIFY
 } transportCode;
 
 #endif
