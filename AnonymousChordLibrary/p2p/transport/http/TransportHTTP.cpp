@@ -89,6 +89,7 @@ void TransportHTTP::initCallbacks() {
 		mg_set_uri_callback(ctx, "/shutdown", &call_chord_shutdown, NULL);
                 mg_set_uri_callback(ctx, "/signod", &call_chord_signod, NULL);
                 mg_set_uri_callback(ctx, "/sigverify", &call_chord_sigverify, NULL);
+                mg_set_uri_callback(ctx, "/getfingertable", &call_chord_getfingertable, NULL);
 
 
 	}

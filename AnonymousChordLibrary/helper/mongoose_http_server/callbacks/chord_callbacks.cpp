@@ -14,6 +14,7 @@
 #include "sha1.h"
 #include <assert.h>
 
+
 /*
  *	/getpred callback, handles a get_predecessor peer request.
  */
@@ -75,7 +76,7 @@ void call_chord_join(struct mg_connection *conn,
 		const struct mg_request_info *request_info, void *user_data)
 
 {
-	//
+	
 }
 
 /*
@@ -163,6 +164,18 @@ void call_chord_sigverify(struct mg_connection *conn,const struct mg_request_inf
         mg_free(port);
 	mg_free(nid);
 
+}
+void call_chord_getfingertable(struct mg_connection *conn,
+                const struct mg_request_info *request_info, void *user_data){
+    
+  
+    std::ostringstream ofs;
+    boost::archive::text_oarchive oa(ofs);
+    ChordNode *node=P_SINGLETON->getChordNode();
+    ofs.flush();
+    oa<<node;
+    
+    mg_printf(conn, ofs.str().c_str());
 }
 
 /*

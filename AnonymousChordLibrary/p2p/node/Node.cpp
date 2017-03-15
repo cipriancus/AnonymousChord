@@ -10,10 +10,26 @@
 #include "Request.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <boost/archive/tmpdir.hpp>
 
+#include <boost/archive/text_iarchive.hpp>
+#include <boost/archive/text_oarchive.hpp>
+
+#include <boost/serialization/base_object.hpp>
+#include <boost/serialization/utility.hpp>
+#include <boost/serialization/vector.hpp>
+#include <boost/serialization/assume_abstract.hpp>
 /*
  *	Constructors
  */
+Node::Node(){
+    ip="";
+    nid=0;
+    port=0;
+    signature="";
+    nidS="";
+    
+}
 Node::Node(const string &inIp, unsigned int inId, unsigned int inPort) {
 	ip = inIp;
 	nid = inId;

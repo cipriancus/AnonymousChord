@@ -17,13 +17,20 @@
 #include "TransportHTTP.h"
 #include <string>
 #include <map>
+#include <vector>
 
 class Stabilization;
 
 using namespace std;
 
+struct contact{
+    ChordNode *node;
+    Node *selectedNode;
+};
+
 class ChordNode: public AbstractChord {
 public:
+        ChordNode();
 	/* Constructor & Destructor */
 	ChordNode(const string &ip, int port, const string &overlayIdentifier,
 			const string &rootDirectory);
@@ -53,20 +60,34 @@ public:
 	/* data CRUD */
 	void saveData(string filename, string value);
 	string openData(string filename);
-	string serialize(string data);
-	string unserialize(string data);
-
+	string serializeData(string data);
+	string unserializeData(string data);
+        
 	/* tools methods */
 	unsigned int   getIntSHA1(string key);
 	char *getHexSHA1(string str);
 	string getIdentifier() 			{ return overlayIdentifier; }
 	TransportHTTP* getTransport()   { return transport; }
-	Node* getThisNode() 			{ return thisNode; }
-
+	std::vector<Node*> getFingerTable(){return fingerTable;}
+        Node* getThisNode() 			{ return thisNode; }
 	/* the transport layer */
 	TransportHTTP* transport;
+        void                    randomWalk();
+
+        
+        friend class boost::serialization::access;
+
+        template<class Archive>
+        void serialize(Archive &ar, const unsigned int version){         
+            ar & fingerTable;      
+        }
+ 
+        pthread_mutex_t calculating = PTHREAD_MUTEX_INITIALIZER;
+        pthread_cond_t done = PTHREAD_COND_INITIALIZER;
 
 private:
+            string getFingerTableFromPeer(list<Node*> *selectedNodes,vector<Node*> *currentTable);
+    
 	/* One thread for the stabilization of each node */
 	Stabilization* stableThread;
 	/* The id of the overlay */
@@ -77,6 +98,7 @@ private:
 	typedef std::pair<string, string> data;
 	typedef std::map<string, string> dataMap;
 	dataMap table;
+        
+       
 };
-
 #endif

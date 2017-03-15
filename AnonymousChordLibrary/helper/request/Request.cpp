@@ -92,8 +92,11 @@ string Request::serialize() {
         case SIGNOD:
 		callback = new string("/signod");
 		break;
-         case SIGVERIFY:
+        case SIGVERIFY:
 		callback = new string("/sigverify");
+		break;
+        case GETFINGERTABLE:
+		callback = new string("/getfingertable");
 		break;
 	default:
 		cout << " UNHANDLED CHORD TRANSPORT CODE! ... ASSERTING" << endl;

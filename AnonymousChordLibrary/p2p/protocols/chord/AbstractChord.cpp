@@ -13,6 +13,12 @@
 #include <iostream>
 #include <sstream>
 #include <vector>
+#include <fstream>
+#include <unistd.h>
+#include <sys/time.h>
+#include <cstring>
+#include <random>  
+
 
 // /////////////////////////////////////////// //
 //                  INITIALISE                 //
@@ -184,3 +190,11 @@ string AbstractChord::printStatus() {
 
 	return ss.str();
 }
+
+int AbstractChord::random(int min, int max){
+    random_device rd;   
+    mt19937 gen(rd()); 
+    uniform_int_distribution<> dist(min,max);
+    return dist(gen);
+}
+

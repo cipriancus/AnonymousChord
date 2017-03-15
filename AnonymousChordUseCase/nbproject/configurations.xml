@@ -35,8 +35,13 @@
         <rebuildPropChanged>false</rebuildPropChanged>
       </toolsSet>
       <compileType>
+        <ccTool>
+          <commandLine>-std=c++11</commandLine>
+          <useLinkerLibraries>false</useLinkerLibraries>
+        </ccTool>
         <linkerTool>
           <linkerDepDynSerchKind>2</linkerDepDynSerchKind>
+          <linkerCopySharedLibs>true</linkerCopySharedLibs>
           <linkerLibItems>
             <linkerLibProjectItem>
               <makeArtifact PL="../AnonymousChordLibrary"
@@ -51,7 +56,7 @@
               </makeArtifact>
             </linkerLibProjectItem>
           </linkerLibItems>
-          <commandLine>-lpthread -lrt -ldl</commandLine>
+          <commandLine>-lpthread -lrt -ldl -lboost_serialization</commandLine>
         </linkerTool>
         <requiredProjects>
           <makeArtifact PL="../AnonymousChordLibrary"

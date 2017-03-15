@@ -24,6 +24,10 @@
 static const std::string PERSISTENCE_DIR = ".chord/data";
 static const std::string PERSISTENCE_DIR_STRING = ".chord/data/%s";
 
+ChordNode::ChordNode(){
+    
+}
+
 /* Constructor */
 ChordNode::ChordNode(const string &ip, int port, const string &overlayIdentifier, const string &rootDirectory) {
 
@@ -114,7 +118,7 @@ string find_and_replace(string str, const string find, string replace) {
 }
 
 /* serialize a postit before to store it into the DHT */
-string ChordNode::serialize(string data) {
+string ChordNode::serializeData(string data) {
 	data = find_and_replace(data, " ", "\\_");
 	data = find_and_replace(data, "\t", "\\t");
 	data = find_and_replace(data, "\n", "\\n");
@@ -122,7 +126,7 @@ string ChordNode::serialize(string data) {
 }
 
 /* reconstruct a serialized postit */
-string ChordNode::unserialize(string data) {
+string ChordNode::unserializeData(string data) {
 	data = find_and_replace(data, "\\_", " ");
 	data = find_and_replace(data, "\\t", "\t");
 	data = find_and_replace(data, "\\n", "\n");
@@ -136,7 +140,7 @@ void ChordNode::saveData(string filename, string value){
 	mkdir(".chord/", 0777);
 	mkdir(".chord/data", 0777);
 	ofstream data(path, ios::out);
-	data << unserialize(value);
+	data << unserializeData(value);
 }
 
 /* return the content of the file */
@@ -335,3 +339,114 @@ void ChordNode::shutDown() {
 	exit(0);
 }
 
+
+
+void *contact_node(void *args){
+    int oldtype;
+
+   contact *contactNodes=(contact*)args;
+        
+    ChordNode *node=contactNodes->node;
+    Node *selectedNode=contactNodes->selectedNode;
+    
+    /* allow the thread to be killed at any time */
+     pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS, &oldtype);
+        
+    Request *request = new Request(node->getIdentifier(), GETFINGERTABLE);
+    string response=node->sendRequest(request, selectedNode);//the serialized finger table from the contacted node
+    
+    pthread_cond_signal(&node->done);
+   
+    char *responseCh=(char*)malloc(response.size()*sizeof(char));
+    strcpy(responseCh,response.c_str());
+    return (void*)responseCh;
+}
+
+string ChordNode::getFingerTableFromPeer(list<Node*> *selectedNodes,vector<Node*> *currentTable){
+        struct timespec max_wait;
+        memset(&max_wait, 0, sizeof(max_wait));        
+        max_wait.tv_sec = 2;    
+    
+       struct timespec abs_time;
+       pthread_t tid;
+       int err;
+        
+       pthread_mutex_lock(&calculating);
+
+        /* pthread cond_timedwait expects an absolute time to wait until */
+        clock_gettime(CLOCK_REALTIME, &abs_time);
+        abs_time.tv_sec += max_wait.tv_sec;
+        abs_time.tv_nsec += max_wait.tv_nsec;
+        
+        sleep(random(0,2));//wait a no of sec for attack prevention
+        
+        int randomNode=random(0,fingerTable.size()-1);//select a random node from current finger table
+        
+        Node *selectedNode=(*currentTable)[randomNode];//select the node
+        selectedNodes->push_back(selectedNode);
+         
+        
+        contact contactNodes;
+        contactNodes.node=this;
+        contactNodes.selectedNode=selectedNode;
+        pthread_create(&tid, NULL, contact_node,(void*)&contactNodes);
+
+        err = pthread_cond_timedwait(&done, &calculating, &abs_time);
+       
+        char * temp;
+        pthread_join(tid, (void**)&temp);
+
+       
+        if (!err){
+                pthread_mutex_unlock(&calculating);
+                
+        }
+
+        return string(temp);
+}
+
+void ChordNode::randomWalk(){
+    //int l=random(fingerTable.size()/2,fingerTable.size());//l-hop random walk
+    int l=1;
+    
+    /**
+     * At the end, this node will inspect the 
+     * given tables and report to the CA if anything is wrong
+     */
+    list<nodesVector> allGivenNodes;//list with all fingertables | They must be digitally signed
+    list<Node*> selectedNodes;//all selected random nodes
+    allGivenNodes.push_back(fingerTable);//my table is first
+    
+    //Faze one
+    for(int iterator=0;iterator<l;iterator++){
+        vector<Node *> currentTable=allGivenNodes.back();
+         
+         
+        string serializedTable = getFingerTableFromPeer(&selectedNodes,&currentTable);
+
+        while(serializedTable.size()==0){
+            serializedTable = getFingerTableFromPeer(&selectedNodes,&currentTable);
+        }
+        
+        //must deserialize finger table
+        ChordNode *tempNode;
+        
+        std::istringstream ifs(serializedTable);
+        boost::archive::text_iarchive ia(ifs);
+        ia>>tempNode;
+        allGivenNodes.push_back(tempNode->getFingerTable());  
+    }//la ultimul pas voi avea ultimul nod din prima parte, cum ar fi B, de pe exemplu
+    
+    //ar trebui facut ping sa vedem daca e in viata si daca nu, selectam altul
+
+    
+    //Faze two
+    /*
+    B alege un nod C1 dupa functia de la I si ii cere fingertabel-ul.
+    B alege un nod D1 dupa functia de la I si ii cere sa caute o informatie.
+    B primeste E1.
+    Se repeta pasii de la 1 la 3 pana cand se ajunge la informatia cautata.
+    */
+    
+    
+}

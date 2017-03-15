@@ -50,4 +50,6 @@ void call_chord_signod(struct mg_connection *conn,
 void call_chord_sigverify(struct mg_connection *conn,
                 const struct mg_request_info *request_info, void *user_data);
 
+void call_chord_getfingertable(struct mg_connection *conn,
+                const struct mg_request_info *request_info, void *user_data);
 #endif

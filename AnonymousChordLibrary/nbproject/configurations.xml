@@ -34,6 +34,7 @@
               <itemPath>helper/crypto/tomcrypt/headers/tomcrypt_pk.h</itemPath>
               <itemPath>helper/crypto/tomcrypt/headers/tomcrypt_pkcs.h</itemPath>
               <itemPath>helper/crypto/tomcrypt/headers/tomcrypt_prng.h</itemPath>
+              <itemPath>helper/crypto/tomcrypt/headers/tomcrypt_test.h</itemPath>
             </logicalFolder>
           </logicalFolder>
           <itemPath>helper/crypto/sha1.cpp</itemPath>
@@ -127,6 +128,7 @@
       </toolsSet>
       <compileType>
         <ccTool>
+          <standard>8</standard>
           <incDir>
             <pElem>helper</pElem>
             <pElem>helper/crypto</pElem>
@@ -140,8 +142,11 @@
             <pElem>p2p/transport/http</pElem>
             <pElem>p2p/transport</pElem>
             <pElem>p2p/protocols/ca</pElem>
+            <pElem>../../Downloads/boost_1_63_0/bin.v2</pElem>
+            <pElem>../../Downloads/boost_1_63_0/stage</pElem>
+            <pElem>build/include</pElem>
           </incDir>
-          <commandLine>-lrt -ldl -lpthread</commandLine>
+          <commandLine>-lrt -ldl -lpthread -lboost_system -D_XOPEN_SOURCE</commandLine>
         </ccTool>
         <archiverTool>
         </archiverTool>
@@ -230,6 +235,11 @@
             flavor2="0">
       </item>
       <item path="helper/crypto/tomcrypt/headers/tomcrypt_prng.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="helper/crypto/tomcrypt/headers/tomcrypt_test.h"
             ex="false"
             tool="3"
             flavor2="0">
@@ -460,6 +470,11 @@
             flavor2="0">
       </item>
       <item path="helper/crypto/tomcrypt/headers/tomcrypt_prng.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="helper/crypto/tomcrypt/headers/tomcrypt_test.h"
             ex="false"
             tool="3"
             flavor2="0">

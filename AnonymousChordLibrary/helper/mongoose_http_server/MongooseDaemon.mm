@@ -113,6 +113,8 @@
 	mg_set_uri_callback(ctx, "/setpred", &call_chord_setpred, NULL);
         mg_set_uri_callback(ctx, "/signod", &call_chord_signod, NULL);
         mg_set_uri_callback(ctx, "/verify", &call_chord_signod, NULL);
+        mg_set_uri_callback(ctx, "/getfingertable", &call_chord_getfingertable, NULL);
+
 
 
 }

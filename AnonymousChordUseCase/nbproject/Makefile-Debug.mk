@@ -42,8 +42,8 @@ OBJECTFILES= \
 CFLAGS=
 
 # CC Compiler Flags
-CCFLAGS=
-CXXFLAGS=
+CCFLAGS=-std=c++11
+CXXFLAGS=-std=c++11
 
 # Fortran Compiler Flags
 FFLAGS=
@@ -62,7 +62,7 @@ ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/anonymouschordusecase: ../AnonymousCh
 
 ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/anonymouschordusecase: ${OBJECTFILES}
 	${MKDIR} -p ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}
-	${LINK.cc} -o ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/anonymouschordusecase ${OBJECTFILES} ${LDLIBSOPTIONS} -lpthread -lrt -ldl
+	${LINK.cc} -o ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/anonymouschordusecase ${OBJECTFILES} ${LDLIBSOPTIONS} -lpthread -lrt -ldl -lboost_serialization
 
 ${OBJECTDIR}/main.o: main.cpp
 	${MKDIR} -p ${OBJECTDIR}

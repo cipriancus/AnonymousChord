@@ -15,6 +15,24 @@
 #include "Request.h"
 #include <vector>
 #include <map>
+#include <list>
+#include <cstddef> // NULL
+#include <iomanip>
+#include <iostream>
+#include <fstream>
+#include <string>
+#include <boost/archive/tmpdir.hpp>
+#include <boost/archive/text_iarchive.hpp>
+#include <boost/archive/text_oarchive.hpp>
+#include <boost/serialization/base_object.hpp>
+#include <boost/serialization/utility.hpp>
+#include <boost/serialization/vector.hpp>
+#include <boost/serialization/assume_abstract.hpp>
+#include <time.h>
+#include <pthread.h>
+#include <stdio.h>
+#include <errno.h>
+#include <string.h>
 
 class AbstractChord: public IOverlay
 {
@@ -65,11 +83,16 @@ public:
 	/* Helper Methods */
 	bool	insideRange(int id, int a, int b);
 	string	printStatus();
+        int     random(int min,int max);
+                
+
 
 protected:
+
+    
 	typedef map<int, string> stringMap;
 	typedef map<int, string>::iterator stringMapIterator;
-	typedef vector<Node *> nodesVector;
+	typedef std::vector<Node *> nodesVector;
 	
 	/** represent this node */
 	Node* thisNode;
@@ -92,7 +115,9 @@ protected:
         string signature;
 
 	/** Time between each stabilization/fix fingerstable */
-	int timeToCheck;
+	int timeToCheck;        
+               
+          
 };
 
 #endif

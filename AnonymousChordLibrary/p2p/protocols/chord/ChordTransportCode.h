@@ -21,7 +21,8 @@ typedef enum {
 	SETPRED,
 	CHECKPRED,
         SIGNOD,
-        SIGVERIFY
+        SIGVERIFY,
+        GETFINGERTABLE
 } transportCode;
 
 #endif

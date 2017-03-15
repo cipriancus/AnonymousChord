@@ -12,7 +12,7 @@ int main(int argc, char * const argv[])
 {
 	string backBone[] = {
 			// first node, CA
-            "192.168.0.100",
+            "127.0.0.1",
 	};
 	
     Node *chord = NULL;
@@ -29,12 +29,13 @@ int main(int argc, char * const argv[])
 			int i = 0;
 		    chord = new Node(backBone[0], 8000);
                     node->join(chord);
-                    if(node->getSignatureFromCA(chord)!=true){
-                        exit(1);
-                    }//take signature from CA
-                    //cout<<node->verifyNodeSignature(node->getThisNode(),string("da"),chord);
+//                    if(node->getSignatureFromCA(chord)!=true){
+//                        exit(1);
+//                    }//take signature from CA
+//                    cout<<node->verifyNodeSignature(node->getThisNode(),node->getThisNode()->getSignature(),chord);
 		}
-
+                
+                /*
 		char entry[256];
 		string key;
 		string value;
@@ -74,8 +75,11 @@ int main(int argc, char * const argv[])
     				node->shutDown();
     			default:
 				break;
-			}       
-	    }
+			}         
+	    }*/
+        node->randomWalk();
+          
+
     } else {
 		cout << "wrong parameters: test.out <hostname> <portNumber> <webContentDirectory> [--join]\n";
 	}
