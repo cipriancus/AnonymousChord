@@ -74,6 +74,8 @@ public:
 	Node*	getSuccessor(){ return successor; }
 	void	setSuccessor(Node *n) { successor = n; }
 	
+        void    setFingerTable(vector<Node*> finger){this->fingerTable=finger;}
+        
 	Node*	getPredecessor() { return predecessor; }
 	void	setPredecessor(Node* n) { predecessor = n; }
 
@@ -84,7 +86,8 @@ public:
 	bool	insideRange(int id, int a, int b);
 	string	printStatus();
         int     random(int min,int max);
-                
+        int     random();
+ 
 
 
 protected:

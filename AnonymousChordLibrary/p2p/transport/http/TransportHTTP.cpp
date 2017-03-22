@@ -1,12 +1,4 @@
-/*
- *  TransportHTTP.cpp
- *  iPhone_p2p_engine
- *
- *  Created by Laurent Vanni & Nicolas Goles Domic, 2010
- *
- */
-
-#include "http_operations.h" //I include .c file for the linker to notice the .o
+#include "http_operations.h" 
 #include "TransportHTTP.h"
 #include "HTTP_Client.h"
 #include "ChordNode.h"
@@ -90,6 +82,7 @@ void TransportHTTP::initCallbacks() {
                 mg_set_uri_callback(ctx, "/signod", &call_chord_signod, NULL);
                 mg_set_uri_callback(ctx, "/sigverify", &call_chord_sigverify, NULL);
                 mg_set_uri_callback(ctx, "/getfingertable", &call_chord_getfingertable, NULL);
+                mg_set_uri_callback(ctx, "/randomwalkcontact", &call_chord_contact, NULL);
 
 
 	}

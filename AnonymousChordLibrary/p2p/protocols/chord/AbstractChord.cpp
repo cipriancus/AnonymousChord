@@ -198,3 +198,7 @@ int AbstractChord::random(int min, int max){
     return dist(gen);
 }
 
+int AbstractChord::random(){
+    random_device rd;   
+    return rd();
+}

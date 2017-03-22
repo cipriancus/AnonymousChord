@@ -18,6 +18,7 @@
 #include <string>
 #include <map>
 #include <vector>
+#include "Query.h"
 
 class Stabilization;
 
@@ -26,6 +27,8 @@ using namespace std;
 struct contact{
     ChordNode *node;
     Node *selectedNode;
+    transportCode tr;
+    map<string,string> queryParams;
 };
 
 class ChordNode: public AbstractChord {
@@ -64,30 +67,38 @@ public:
 	string unserializeData(string data);
         
 	/* tools methods */
-	unsigned int   getIntSHA1(string key);
-	char *getHexSHA1(string str);
-	string getIdentifier() 			{ return overlayIdentifier; }
-	TransportHTTP* getTransport()   { return transport; }
-	std::vector<Node*> getFingerTable(){return fingerTable;}
-        Node* getThisNode() 			{ return thisNode; }
-	/* the transport layer */
-	TransportHTTP* transport;
-        void                    randomWalk();
-
+        Query* searchForQueryByHash(string hash);
+	unsigned int   getIntSHA1(string key);	
+        char *getHexSHA1(string str);	
+        string getIdentifier() 			{ return overlayIdentifier; }	
+        TransportHTTP* getTransport()   { return transport; }	
+        std::vector<Node*> getFingerTable(){return fingerTable;}   
+        Node* getThisNode() 			{ return thisNode; }    
+        string serialize(ChordNode *node);   
+        ChordNode* deserialize(string data);
+        bool getQueryForHash(string hash,Query *query);
         
+      
+        void                    randomWalk();
+      
         friend class boost::serialization::access;
 
         template<class Archive>
-        void serialize(Archive &ar, const unsigned int version){         
-            ar & fingerTable;      
-        }
- 
-        pthread_mutex_t calculating = PTHREAD_MUTEX_INITIALIZER;
-        pthread_cond_t done = PTHREAD_COND_INITIALIZER;
+        void serialize(Archive &ar, const unsigned int version){ar & fingerTable;}
+       
+        string send_request_with_timeout(Node *selectedNode,transportCode tr,int noOfSecondsToWait,map<string,string> &queryParams);
 
+         
+        
+        pthread_mutex_t calculating = PTHREAD_MUTEX_INITIALIZER; 
+        pthread_cond_t done = PTHREAD_COND_INITIALIZER;
 private:
-            string getFingerTableFromPeer(list<Node*> *selectedNodes,vector<Node*> *currentTable);
+        char* itoa(int num,char* str,int base);
+        void  reverse(char str[], int length);
+
     
+        TransportHTTP* transport;
+
 	/* One thread for the stabilization of each node */
 	Stabilization* stableThread;
 	/* The id of the overlay */
@@ -98,6 +109,8 @@ private:
 	typedef std::pair<string, string> data;
 	typedef std::map<string, string> dataMap;
 	dataMap table;
+        
+        vector<Query*> allQueries;
         
        
 };

@@ -12,7 +12,7 @@
 #include "FixFinger.h"
 #include "TransportHTTP.h"
 #include "callbacks.h"
-#include "sha1.h";
+#include "sha1.h"
 #include <sstream>
 #include <iostream>
 #include <sys/stat.h>
@@ -117,6 +117,16 @@ string find_and_replace(string str, const string find, string replace) {
 	return source;
 }
 
+Query* ChordNode::searchForQueryByHash(string hash){
+    vector<Query*>::iterator it;
+    for(it=allQueries.begin();it!=allQueries.end();it++){
+        if((*it)->getQueryHash().compare(hash)==0){
+            return (*it);
+        }
+    }
+    return NULL;
+}
+
 /* serialize a postit before to store it into the DHT */
 string ChordNode::serializeData(string data) {
 	data = find_and_replace(data, " ", "\\_");
@@ -162,6 +172,23 @@ string ChordNode::openData(string filename){
 	else return "null";
 	return data;
 }
+
+string ChordNode::serialize(ChordNode* node) {
+    std::ostringstream ofs;
+    boost::archive::text_oarchive oa(ofs);   
+    ofs.flush();
+    oa<<node;
+    return ofs.str();
+}
+
+ChordNode* ChordNode::deserialize(string data){
+    ChordNode *tempNode;
+    std::istringstream ifs(data);
+    boost::archive::text_iarchive ia(ifs);
+    ia>>tempNode;
+    return tempNode;
+}
+
 
 /* DHT Put */
 void ChordNode::put(string key, string value) {
@@ -298,6 +325,21 @@ void ChordNode::checkStable() {
 	stableThread->start();
 }
 
+bool ChordNode::getQueryForHash(string hash, Query *query) {
+    vector<Query*>::iterator it;
+    for(it=allQueries.begin();it!=allQueries.end();it++){
+        if((*it)->getQueryHash().compare(hash)==0)
+            break;
+    }    
+    if(it==allQueries.end()){
+        return false;
+    }else{
+        query=(*it);
+        return true;
+    }
+}
+
+
 /* Stop the stabilization, distribute the key and shutDown the peer */
 void ChordNode::shutDown() {
 	// kill the stabilization Threads
@@ -340,21 +382,85 @@ void ChordNode::shutDown() {
 }
 
 
+/* A utility function to reverse a string  */
+void ChordNode::reverse(char str[], int length)
+{
+    int start = 0;
+    int end = length -1;
+    while (start < end)
+    {
+        swap(*(str+start), *(str+end));
+        start++;
+        end--;
+    }
+}
+ 
+// Implementation of itoa()
+char* ChordNode::itoa(int num, char* str, int base)
+{
+    int i = 0;
+    bool isNegative = false;
+ 
+    /* Handle 0 explicitely, otherwise empty string is printed for 0 */
+    if (num == 0)
+    {
+        str[i++] = '0';
+        str[i] = '\0';
+        return str;
+    }
+ 
+    // In standard itoa(), negative numbers are handled only with 
+    // base 10. Otherwise numbers are considered unsigned.
+    if (num < 0 && base == 10)
+    {
+        isNegative = true;
+        num = -num;
+    }
+ 
+    // Process individual digits
+    while (num != 0)
+    {
+        int rem = num % base;
+        str[i++] = (rem > 9)? (rem-10) + 'a' : rem + '0';
+        num = num/base;
+    }
+ 
+    // If number is negative, append '-'
+    if (isNegative)
+        str[i++] = '-';
+ 
+    str[i] = '\0'; // Append string terminator
+ 
+    // Reverse the string
+    reverse(str, i);
+ 
+    return str;
+}
+ 
 
 void *contact_node(void *args){
-    int oldtype;
+      int oldtype;
 
-   contact *contactNodes=(contact*)args;
+    contact *contactNodes=(contact*)args;
         
     ChordNode *node=contactNodes->node;
     Node *selectedNode=contactNodes->selectedNode;
-    
+    map<string,string> queryParams=contactNodes->queryParams;
+
     /* allow the thread to be killed at any time */
      pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS, &oldtype);
         
-    Request *request = new Request(node->getIdentifier(), GETFINGERTABLE);
-    string response=node->sendRequest(request, selectedNode);//the serialized finger table from the contacted node
+    Request *request = new Request(node->getIdentifier(), contactNodes->tr);
     
+        if(queryParams.size()>0){
+            map<string,string>::iterator it;
+            for(it=queryParams.begin();it!=queryParams.end();it++){
+                  request->addArg((*it).first,(*it).second);
+            }
+        }
+    
+    string response=node->sendRequest(request, selectedNode);//the serialized finger table from the contacted node
+   
     pthread_cond_signal(&node->done);
    
     char *responseCh=(char*)malloc(response.size()*sizeof(char));
@@ -362,10 +468,10 @@ void *contact_node(void *args){
     return (void*)responseCh;
 }
 
-string ChordNode::getFingerTableFromPeer(list<Node*> *selectedNodes,vector<Node*> *currentTable){
-        struct timespec max_wait;
-        memset(&max_wait, 0, sizeof(max_wait));        
-        max_wait.tv_sec = 2;    
+string ChordNode::send_request_with_timeout(Node *selectedNode,transportCode tr,int noOfSecondsToWait,map<string,string> &queryParams){
+       struct timespec max_wait;
+       memset(&max_wait, 0, sizeof(max_wait));        
+       max_wait.tv_sec = noOfSecondsToWait;    
     
        struct timespec abs_time;
        pthread_t tid;
@@ -379,74 +485,71 @@ string ChordNode::getFingerTableFromPeer(list<Node*> *selectedNodes,vector<Node*
         abs_time.tv_nsec += max_wait.tv_nsec;
         
         sleep(random(0,2));//wait a no of sec for attack prevention
-        
-        int randomNode=random(0,fingerTable.size()-1);//select a random node from current finger table
-        
-        Node *selectedNode=(*currentTable)[randomNode];//select the node
-        selectedNodes->push_back(selectedNode);
-         
-        
+             
         contact contactNodes;
         contactNodes.node=this;
         contactNodes.selectedNode=selectedNode;
+        contactNodes.tr=tr;
+        contactNodes.queryParams=queryParams;
+        
         pthread_create(&tid, NULL, contact_node,(void*)&contactNodes);
 
         err = pthread_cond_timedwait(&done, &calculating, &abs_time);
        
         char * temp;
-        pthread_join(tid, (void**)&temp);
 
-       
         if (!err){
-                pthread_mutex_unlock(&calculating);
-                
+            pthread_mutex_unlock(&calculating);
+            pthread_join(tid, (void**)&temp);
+            return string(temp);
         }
-
-        return string(temp);
+        pthread_cancel(tid);
+        pthread_mutex_unlock(&calculating);
+        return string("");
 }
 
-void ChordNode::randomWalk(){
-    //int l=random(fingerTable.size()/2,fingerTable.size());//l-hop random walk
-    int l=1;
-    
-    /**
-     * At the end, this node will inspect the 
-     * given tables and report to the CA if anything is wrong
-     */
-    list<nodesVector> allGivenNodes;//list with all fingertables | They must be digitally signed
-    list<Node*> selectedNodes;//all selected random nodes
-    allGivenNodes.push_back(fingerTable);//my table is first
+void ChordNode::randomWalk(){   
+    Query *query=new Query(1,1);
+    allQueries.push_back(query);
+    query->addFingerTable(fingerTable,thisNode);
     
     //Faze one
-    for(int iterator=0;iterator<l;iterator++){
-        vector<Node *> currentTable=allGivenNodes.back();
-         
-         
-        string serializedTable = getFingerTableFromPeer(&selectedNodes,&currentTable);
-
-        while(serializedTable.size()==0){
-            serializedTable = getFingerTableFromPeer(&selectedNodes,&currentTable);
-        }
+    for(int iterator=0;iterator<query->getL();iterator){
+        vector<Node *> currentTable=query->getLastFingerTableEntry();
         
-        //must deserialize finger table
-        ChordNode *tempNode;
+        string serializedTable;
         
-        std::istringstream ifs(serializedTable);
-        boost::archive::text_iarchive ia(ifs);
-        ia>>tempNode;
-        allGivenNodes.push_back(tempNode->getFingerTable());  
-    }//la ultimul pas voi avea ultimul nod din prima parte, cum ar fi B, de pe exemplu
-    
-    //ar trebui facut ping sa vedem daca e in viata si daca nu, selectam altul
-
+        Node *selectedNode;
+                
+        do{
+            int randomNode=random(0,fingerTable.size()-1);//select a random node from current finger table
+        
+            selectedNode=currentTable[randomNode];//select the node
+            
+            //check if it wasn't selected before
+            if(query->hasBeenSelected(selectedNode)==false){
+                map<string,string> queryParams;      
+                serializedTable = send_request_with_timeout(selectedNode,GETFINGERTABLE,4,queryParams);
+            }
+        }while(serializedTable.size()==0);
+        
+        //if duplicate
+        if(query->addFingerTable(deserialize(serializedTable)->getFingerTable(),selectedNode)==true){
+            iterator++;
+        }   
+    }//at the end in selectedNodes we will have the chain of nodes
     
     //Faze two
-    /*
-    B alege un nod C1 dupa functia de la I si ii cere fingertabel-ul.
-    B alege un nod D1 dupa functia de la I si ii cere sa caute o informatie.
-    B primeste E1.
-    Se repeta pasii de la 1 la 3 pana cand se ajunge la informatia cautata.
-    */
     
+    //se va contacta ultimul nod din prima parte pentru a selecta o serie de noduri
+    Node* A=query->getSelectedNodes().front();//get first selected nod of first part of random walk
     
+    ChordNode *tempNode=new ChordNode();
+    tempNode->setFingerTable(query->getSelectedNodes());
+    
+    map<string,string> queryParams;
+    queryParams["table"]=tempNode->serialize(tempNode);
+       
+    string response = send_request_with_timeout(A,RANDOMWALKCONTACT,10,queryParams);   
+    cout<<response.c_str();
 }

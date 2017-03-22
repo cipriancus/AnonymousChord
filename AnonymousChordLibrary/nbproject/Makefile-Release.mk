@@ -51,6 +51,7 @@ OBJECTFILES= \
 	${OBJECTDIR}/p2p/protocols/ca/CertificationAuthority.o \
 	${OBJECTDIR}/p2p/protocols/chord/AbstractChord.o \
 	${OBJECTDIR}/p2p/protocols/chord/ChordNode.o \
+	${OBJECTDIR}/p2p/protocols/chord/Query.o \
 	${OBJECTDIR}/p2p/transport/http/TransportHTTP.o \
 	${OBJECTDIR}/p2p/transport/http/http_operations.o
 
@@ -160,6 +161,11 @@ ${OBJECTDIR}/p2p/protocols/chord/ChordNode.o: p2p/protocols/chord/ChordNode.cpp
 	${MKDIR} -p ${OBJECTDIR}/p2p/protocols/chord
 	${RM} "$@.d"
 	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/p2p/protocols/chord/ChordNode.o p2p/protocols/chord/ChordNode.cpp
+
+${OBJECTDIR}/p2p/protocols/chord/Query.o: p2p/protocols/chord/Query.cpp
+	${MKDIR} -p ${OBJECTDIR}/p2p/protocols/chord
+	${RM} "$@.d"
+	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/p2p/protocols/chord/Query.o p2p/protocols/chord/Query.cpp
 
 ${OBJECTDIR}/p2p/transport/http/TransportHTTP.o: p2p/transport/http/TransportHTTP.cpp
 	${MKDIR} -p ${OBJECTDIR}/p2p/transport/http

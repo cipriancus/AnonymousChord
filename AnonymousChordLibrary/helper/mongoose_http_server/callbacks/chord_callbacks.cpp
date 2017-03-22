@@ -113,6 +113,25 @@ void call_chord_get(struct mg_connection *conn,
 	//Release the allocated memory for id variable.
 	mg_free(key);
 }
+
+void call_chord_getNewNode(struct mg_connection *conn,
+		const struct mg_request_info *request_info, void *user_data) {
+	string result;
+	char *hash = NULL;
+
+	assert((hash = mg_get_var(conn, "hash")) != NULL);
+
+        Query *query;
+        
+	if(P_SINGLETON->getChordNode()->getQueryForHash(hash,query)==true){
+            //hashes are the same
+            //select new nodes
+            Node *node=query->selectNewNode(P_SINGLETON->getChordNode()->getFingerTable());
+        }else{
+            //maybe report to CA ?
+        }
+}
+
 //calls for a digital signature
 void call_chord_signod(struct mg_connection *conn,const struct mg_request_info *request_info, void *user_data) {
 	string result;
@@ -166,16 +185,59 @@ void call_chord_sigverify(struct mg_connection *conn,const struct mg_request_inf
 
 }
 void call_chord_getfingertable(struct mg_connection *conn,
+                const struct mg_request_info *request_info, void *user_data){    
+ 
+    ChordNode *node=P_SINGLETON->getChordNode();
+
+    const char *p=node->serialize(P_SINGLETON->getChordNode()).c_str();
+    
+    mg_printf(conn, p);
+}
+
+void call_chord_contact(struct mg_connection *conn,
                 const struct mg_request_info *request_info, void *user_data){
     
+  char *tablech;
   
-    std::ostringstream ofs;
-    boost::archive::text_oarchive oa(ofs);
-    ChordNode *node=P_SINGLETON->getChordNode();
-    ofs.flush();
-    oa<<node;
+  assert((tablech  = mg_get_var(conn, "table")) != NULL);
+  
+  string tablestr=string(tablech);
+  
+  ChordNode *tempNode=P_SINGLETON->getChordNode()->deserialize(tablestr);
+  
+  vector<Node*> table=tempNode->getFingerTable();
+  
+  if(table.size()!=0){//I am not final note in first step
+    Node* node=table.front();
+    table.erase(table.begin(),table.begin()+1); 
+    int noOfSeconds=2;
+
+    if(table.size()!=0){//nodul selectat nu e ultimul
+        tempNode=new ChordNode();
+        tempNode->setFingerTable(table);
+
+        map<string,string> query_params;
+        query_params["table"]=tempNode->serialize(tempNode);
+
+        string response=P_SINGLETON->getChordNode()->send_request_with_timeout(node,RANDOMWALKCONTACT,noOfSeconds,query_params);
+        
+        //daca response e gol "" inseamna ca nodul nu a raspuns si ar trebui selectat altul de catre I
+        
+
+        mg_printf(conn, response.c_str());
+    }else{
+        //e ultimul nod selectat
+        //i cer sa initieze faza B
+        map<string,string> query_params;
+        string response=P_SINGLETON->getChordNode()->send_request_with_timeout(node,GETFINGERTABLE,noOfSeconds,query_params);
+        mg_printf(conn, response.c_str());
+    } 
+  }else{//I am the final node in first step
+    mg_printf(conn, P_SINGLETON->getChordNode()->serialize(P_SINGLETON->getChordNode()).c_str());
     
-    mg_printf(conn, ofs.str().c_str());
+    //ar trebui aici initiata faza 2 in care ultimul nod selecteaza inca alte l noduri
+    
+  }
 }
 
 /*

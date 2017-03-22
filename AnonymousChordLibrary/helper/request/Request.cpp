@@ -18,7 +18,10 @@ Request::Request(string overlayID, int code) {
 
 /* Adds an arument to the Request arguments Map. */
 void Request::addArg(string key, string value) {
-	arguments.insert(arg(key, value));
+    for (size_t pos = value.find(' '); pos != string::npos; pos = value.find(' ', pos)){
+        value.replace(pos, 1, "%20");
+    }
+    arguments.insert(arg(key, value));
 }
 
 /* Request an argument to the request arguments Map. */
@@ -97,6 +100,9 @@ string Request::serialize() {
 		break;
         case GETFINGERTABLE:
 		callback = new string("/getfingertable");
+		break;
+        case RANDOMWALKCONTACT:
+		callback = new string("/randomwalkcontact");
 		break;
 	default:
 		cout << " UNHANDLED CHORD TRANSPORT CODE! ... ASSERTING" << endl;

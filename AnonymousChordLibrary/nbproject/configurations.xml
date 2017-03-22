@@ -86,6 +86,8 @@
             <itemPath>p2p/protocols/chord/ChordNode.cpp</itemPath>
             <itemPath>p2p/protocols/chord/ChordNode.h</itemPath>
             <itemPath>p2p/protocols/chord/ChordTransportCode.h</itemPath>
+            <itemPath>p2p/protocols/chord/Query.cpp</itemPath>
+            <itemPath>p2p/protocols/chord/Query.h</itemPath>
           </logicalFolder>
           <itemPath>p2p/protocols/ProtocolSingleton.cpp</itemPath>
           <itemPath>p2p/protocols/ProtocolSingleton.h</itemPath>
@@ -342,6 +344,10 @@
             tool="3"
             flavor2="0">
       </item>
+      <item path="p2p/protocols/chord/Query.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="p2p/protocols/chord/Query.h" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="p2p/transport/IOverlay.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="p2p/transport/ITransport.h" ex="false" tool="3" flavor2="0">
@@ -576,6 +582,10 @@
             ex="false"
             tool="3"
             flavor2="0">
+      </item>
+      <item path="p2p/protocols/chord/Query.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="p2p/protocols/chord/Query.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="p2p/transport/IOverlay.h" ex="false" tool="3" flavor2="0">
       </item>

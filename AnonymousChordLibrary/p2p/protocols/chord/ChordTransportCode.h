@@ -22,7 +22,8 @@ typedef enum {
 	CHECKPRED,
         SIGNOD,
         SIGVERIFY,
-        GETFINGERTABLE
+        GETFINGERTABLE,//get finger table from a node
+        RANDOMWALKCONTACT//call_chord_contact for selecting a path
 } transportCode;
 
 #endif
