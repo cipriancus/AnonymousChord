@@ -104,3 +104,19 @@ string Node::toString() {
 	return (ss.str());
 }
 
+string Node::serializeNode() {
+    std::ostringstream ofs;
+    boost::archive::text_oarchive oa(ofs);   
+    ofs.flush();
+    oa<<this;
+    return ofs.str();
+}
+
+Node* Node::deserializeNode(string serializedNode) {
+    Node *tempNode;
+    std::istringstream ifs(serializedNode);
+    boost::archive::text_iarchive ia(ifs);
+    ia>>tempNode;
+    return tempNode;
+}
+

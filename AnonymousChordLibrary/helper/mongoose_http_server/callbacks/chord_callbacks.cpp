@@ -12,6 +12,7 @@
 #include "mongoose.h"
 #include "http_operations.h"
 #include "sha1.h"
+#include "HELPER.h"
 #include <assert.h>
 
 
@@ -114,24 +115,6 @@ void call_chord_get(struct mg_connection *conn,
 	mg_free(key);
 }
 
-void call_chord_getNewNode(struct mg_connection *conn,
-		const struct mg_request_info *request_info, void *user_data) {
-	string result;
-	char *hash = NULL;
-
-	assert((hash = mg_get_var(conn, "hash")) != NULL);
-
-        Query *query;
-        
-	if(P_SINGLETON->getChordNode()->getQueryForHash(hash,query)==true){
-            //hashes are the same
-            //select new nodes
-            Node *node=query->selectNewNode(P_SINGLETON->getChordNode()->getFingerTable());
-        }else{
-            //maybe report to CA ?
-        }
-}
-
 //calls for a digital signature
 void call_chord_signod(struct mg_connection *conn,const struct mg_request_info *request_info, void *user_data) {
 	string result;
@@ -187,21 +170,130 @@ void call_chord_sigverify(struct mg_connection *conn,const struct mg_request_inf
 void call_chord_getfingertable(struct mg_connection *conn,
                 const struct mg_request_info *request_info, void *user_data){    
  
+    time_t time=P_SINGLETON->getChordNode()->getStartTime();
+    long int start_time=static_cast<int>(time);
+   
+    mg_printf(conn,HELPER::serializeLongInt(start_time).c_str());
+}
+
+void call_chord_getOnlineTime(struct mg_connection *conn,
+                const struct mg_request_info *request_info, void *user_data){    
+ 
     ChordNode *node=P_SINGLETON->getChordNode();
 
-    const char *p=node->serialize(P_SINGLETON->getChordNode()).c_str();
+    const char *p=HELPER::serializeLongInt(P_SINGLETON->getChordNode()->getStartTime()).c_str();
     
     mg_printf(conn, p);
 }
 
+void call_chord_getNewNode(struct mg_connection *conn,
+		const struct mg_request_info *request_info, void *user_data) {
+	string result;
+	char *hashch = NULL;
+        char *failednodech = NULL;
+        
+	assert((hashch = mg_get_var(conn, "hash")) != NULL);
+	assert((failednodech = mg_get_var(conn, "failed_node")) != NULL);
+
+        string hash=string(hashch);
+        
+
+        Query *query;
+        
+        //my query 
+	if(P_SINGLETON->getChordNode()->getQueryForHash(hash,query)==true){
+            //Get Failed Node
+            Node *failed_node=new Node();
+            failed_node=failed_node->deserializeNode(string(failednodech));
+        
+            int times=0;
+            string response;
+            int noOfSeconds=2;
+            map<string,string> query_params;
+            do{
+                //test if nodes respond
+                response=P_SINGLETON->getChordNode()->send_request_with_timeout(failed_node,GETONLINETIME,noOfSeconds,query_params);
+                times++;
+            }while(response.size()!=0 &times<3);
+            
+            if(times<3){//node is on
+                long int interogration_time=HELPER::deserializeLongInt(mg_get_var(conn,"time_of_fail"));//time node was declared dead time_of_fail
+                long int node_on_time=HELPER::deserializeLongInt(response);//time node went online
+                
+                if(interogration_time>node_on_time){
+                    //report to CA
+                    response=string("abort");
+                    mg_printf(conn, response.c_str());
+                }
+                
+                //truth has been told, the node was offline
+                //hashes are the same
+                //select new nodes
+                Node *node=query->selectNewNode(P_SINGLETON->getChordNode()->getFingerTable());
+                string serializedNode=node->serializeNode();
+                mg_printf(conn, serializedNode.c_str());
+            }
+        }else{
+            //nu i a meu, dam mai departe
+            vector<Node*> query=P_SINGLETON->getChordNode()->getPassedQueryForHash(hash);
+            if(query.size()>0){
+                //am gasit
+                Node *predecesor=query[0];
+                Node *succesor=query[1];
+                
+                if(succesor->getIp().compare(string(returnIP(conn)))==0){//succesorul e corect
+                    string response;
+                    int times=0;        
+                    map<string,string> query_params;
+                    query_params["hash"]=hash;
+                    int noOfSeconds=2;
+
+                    do{
+                        //test if nodes respond
+                        response=P_SINGLETON->getChordNode()->send_request_with_timeout(predecesor,GETNNEWNODE,noOfSeconds,query_params);
+                        times++;
+                    }while(response.size()!=0 &times<3);
+                  
+                    //it failed, return a failure
+                    if(times==3){
+                        response=string("failed");
+                    }
+                    
+                    mg_printf(conn, response.c_str());
+                }else{
+                   string response=string("failed");
+                   mg_printf(conn, response.c_str());
+                }    
+            }
+        }
+}
+
+
 void call_chord_contact(struct mg_connection *conn,
                 const struct mg_request_info *request_info, void *user_data){
     
-  char *tablech;
-  
-  assert((tablech  = mg_get_var(conn, "table")) != NULL);
-  
+  char *tablech = NULL;
+  char *hashch = NULL;
+  char *lch = NULL;
+  char *keych = NULL;
+
+  tablech  = mg_get_var(conn, "table");
+  assert((hashch = mg_get_var(conn, "hash")) != NULL);
+  assert((lch = mg_get_var(conn, "l")) != NULL);
+  assert((keych = mg_get_var(conn, "key")) != NULL);
+
+  string l=string(lch);
   string tablestr=string(tablech);
+  string hash=string(hashch);
+  string key=string(keych);
+
+  /*
+  ADAUG INFO despre pred si succ 
+   */
+  vector<Node*> predSucc;
+  assert((predSucc[0] = P_SINGLETON->getChordNode()->getNodeForIP(string(returnIP(conn)))) != NULL);
+  predSucc[1]=P_SINGLETON->getChordNode()->getThisNode();
+  P_SINGLETON->getChordNode()->addPassedQuery(hash,predSucc);
   
   ChordNode *tempNode=P_SINGLETON->getChordNode()->deserialize(tablestr);
   
@@ -218,26 +310,54 @@ void call_chord_contact(struct mg_connection *conn,
 
         map<string,string> query_params;
         query_params["table"]=tempNode->serialize(tempNode);
+        query_params["hash"]=hash;
+        query_params["l"]=l;
+        query_params["key"]=key;
 
-        string response=P_SINGLETON->getChordNode()->send_request_with_timeout(node,RANDOMWALKCONTACT,noOfSeconds,query_params);
-        
-        //daca response e gol "" inseamna ca nodul nu a raspuns si ar trebui selectat altul de catre I
-        
+            string response;
+            int times=0;        
+            int noOfSeconds=2;
 
+            do{
+                response=P_SINGLETON->getChordNode()->send_request_with_timeout(node,RANDOMWALKCONTACT,noOfSeconds,query_params);
+                times++;
+            }while(response.size()!=0 &times<3);
+        
+            if(times==3||response.compare("failed")==0){
+                //failed
+                string serializedNode=node->serializeNode();//give the failed node for inspection
+                query_params["failed_node"]=serializedNode;//ar trebui criptat cu cheia publica a Query ului ca sa nu fie fazut de toti
+                query_params["time_of_fail"]=HELPER::serializeLongInt(time(nullptr));
+                do{
+                    response=P_SINGLETON->getChordNode()->send_request_with_timeout(predSucc[0],GETNNEWNODE,noOfSeconds,query_params);
+                    times++;
+                }while(response.size()!=0 &times<3);
+                
+                if(times==3){
+                    response=string("failed");
+                }              
+            }
         mg_printf(conn, response.c_str());
     }else{
         //e ultimul nod selectat
-        //i cer sa initieze faza B
+        //ii cer sa initieze faza 2
+        
         map<string,string> query_params;
-        string response=P_SINGLETON->getChordNode()->send_request_with_timeout(node,GETFINGERTABLE,noOfSeconds,query_params);
+        query_params["table"]=tempNode->serialize(tempNode);
+        query_params["hash"]=hash;
+        query_params["l"]=l;
+        query_params["key"]=l;
+
+        string response=P_SINGLETON->getChordNode()->send_request_with_timeout(node,RANDOMWALKGETKEY,noOfSeconds,query_params);
         mg_printf(conn, response.c_str());
     } 
-  }else{//I am the final node in first step
-    mg_printf(conn, P_SINGLETON->getChordNode()->serialize(P_SINGLETON->getChordNode()).c_str());
-    
-    //ar trebui aici initiata faza 2 in care ultimul nod selecteaza inca alte l noduri
-    
   }
+}
+
+void call_chord_getkey(struct mg_connection *conn,
+                const struct mg_request_info *request_info, void *user_data){
+
+
 }
 
 /*

@@ -35,6 +35,7 @@ OBJECTDIR=${CND_BUILDDIR}/${CND_CONF}/${CND_PLATFORM}
 
 # Object Files
 OBJECTFILES= \
+	${OBJECTDIR}/helper/HELPER.o \
 	${OBJECTDIR}/helper/HTTP_Client.o \
 	${OBJECTDIR}/helper/crypto/sha1.o \
 	${OBJECTDIR}/helper/crypto/tomcrypt/algorithms/crypt_argchk.o \
@@ -81,6 +82,11 @@ ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/libanonymouschordlibrary.a: ${OBJECTF
 	${RM} ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/libanonymouschordlibrary.a
 	${AR} -rv ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/libanonymouschordlibrary.a ${OBJECTFILES} 
 	$(RANLIB) ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/libanonymouschordlibrary.a
+
+${OBJECTDIR}/helper/HELPER.o: helper/HELPER.cpp
+	${MKDIR} -p ${OBJECTDIR}/helper
+	${RM} "$@.d"
+	$(COMPILE.cc) -g -Ihelper -Ihelper/crypto -Ihelper/mongoose_http_server/callbacks -Ihelper/mongoose_http_server -Ihelper/thread -Ihelper/request -Ip2p/node -Ip2p/protocols -Ip2p/protocols/chord -Ip2p/transport/http -Ip2p/transport -Ip2p/protocols/ca -I../../Downloads/boost_1_63_0/bin.v2 -I../../Downloads/boost_1_63_0/stage -Ibuild/include -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/helper/HELPER.o helper/HELPER.cpp
 
 ${OBJECTDIR}/helper/HTTP_Client.o: helper/HTTP_Client.cpp
 	${MKDIR} -p ${OBJECTDIR}/helper

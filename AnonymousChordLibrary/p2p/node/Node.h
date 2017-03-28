@@ -53,10 +53,10 @@ public:
         friend class boost::serialization::access;
 
         template<class Archive>
-            void serialize(Archive &ar,unsigned int version){
-        // save/load base class information
-            ar & signature & ip &nid&nidS&port;
-        }
+            void serialize(Archive &ar,unsigned int version);
+        
+        string serializeNode();
+        Node*  deserializeNode(string serializedNode);
 
 private:
         string signature;

@@ -23,7 +23,10 @@ typedef enum {
         SIGNOD,
         SIGVERIFY,
         GETFINGERTABLE,//get finger table from a node
-        RANDOMWALKCONTACT//call_chord_contact for selecting a path
+        RANDOMWALKCONTACT,//call_chord_contact for selecting a path
+        GETNNEWNODE,//get a new node for a random walk
+        GETONLINETIME,
+        RANDOMWALKGETKEY
 } transportCode;
 
 #endif

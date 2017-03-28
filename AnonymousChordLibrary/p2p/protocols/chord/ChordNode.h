@@ -18,6 +18,7 @@
 #include <string>
 #include <map>
 #include <vector>
+#include <ctime>
 #include "Query.h"
 
 class Stabilization;
@@ -70,6 +71,7 @@ public:
         Query* searchForQueryByHash(string hash);
 	unsigned int   getIntSHA1(string key);	
         char *getHexSHA1(string str);	
+        time_t getStartTime(){return startTime;}
         string getIdentifier() 			{ return overlayIdentifier; }	
         TransportHTTP* getTransport()   { return transport; }	
         std::vector<Node*> getFingerTable(){return fingerTable;}   
@@ -77,9 +79,10 @@ public:
         string serialize(ChordNode *node);   
         ChordNode* deserialize(string data);
         bool getQueryForHash(string hash,Query *query);
-        
-      
-        void                    randomWalk();
+        Node* getNodeForIP(string ip);
+        vector<Node*> getPassedQueryForHash(string hash);
+        void          addPassedQuery(string hash, vector<Node*> predSucc);
+        void                    randomWalk(string key);
       
         friend class boost::serialization::access;
 
@@ -92,9 +95,11 @@ public:
         
         pthread_mutex_t calculating = PTHREAD_MUTEX_INITIALIZER; 
         pthread_cond_t done = PTHREAD_COND_INITIALIZER;
-private:
+        
+        
         char* itoa(int num,char* str,int base);
         void  reverse(char str[], int length);
+private:
 
     
         TransportHTTP* transport;
@@ -110,8 +115,12 @@ private:
 	typedef std::map<string, string> dataMap;
 	dataMap table;
         
-        vector<Query*> allQueries;
+        //all processed queries over a time length
+        map<string,vector<Node*>> passedQueries;
         
-       
+        time_t startTime; 
+                
+        vector<Query*> allQueries;
+
 };
 #endif

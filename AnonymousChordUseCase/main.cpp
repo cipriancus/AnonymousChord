@@ -12,7 +12,7 @@ int main(int argc, char * const argv[])
 {
 	string backBone[] = {
 			// first node, CA
-            "127.0.0.1",
+            "192.168.0.104",
 	};
 	
     Node *chord = NULL;
@@ -77,7 +77,11 @@ int main(int argc, char * const argv[])
 				break;
 			}         
 	    }*/
-        node->randomWalk();
+        string key;
+    	cin >> key;
+
+        sleep(5);
+        node->randomWalk(key);
           
 
     } else {

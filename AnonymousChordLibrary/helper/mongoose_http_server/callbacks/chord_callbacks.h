@@ -44,6 +44,7 @@ void call_chord_hash(struct mg_connection *conn,
 
 void call_chord_shutdown(struct mg_connection *conn,
 		const struct mg_request_info *request_info, void *user_data);
+
 void call_chord_signod(struct mg_connection *conn,
                 const struct mg_request_info *request_info, void *user_data) ;
 
@@ -52,6 +53,17 @@ void call_chord_sigverify(struct mg_connection *conn,
 
 void call_chord_getfingertable(struct mg_connection *conn,
                 const struct mg_request_info *request_info, void *user_data);
+
 void call_chord_contact(struct mg_connection *conn,
                 const struct mg_request_info *request_info, void *user_data);
+
+void call_chord_getkey(struct mg_connection *conn,
+                const struct mg_request_info *request_info, void *user_data);
+
+void call_chord_getNewNode(struct mg_connection *conn,
+		const struct mg_request_info *request_info, void *user_data);
+
+void call_chord_getOnlineTime(struct mg_connection *conn,
+                const struct mg_request_info *request_info, void *user_data);
+
 #endif

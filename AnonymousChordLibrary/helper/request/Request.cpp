@@ -104,6 +104,15 @@ string Request::serialize() {
         case RANDOMWALKCONTACT:
 		callback = new string("/randomwalkcontact");
 		break;
+        case GETNNEWNODE:
+		callback = new string("/getnewnode");
+		break;
+        case GETONLINETIME:
+		callback = new string("/getonlinetime");
+		break;
+        case RANDOMWALKGETKEY:
+		callback = new string("/randomwalkgetkey");
+		break;
 	default:
 		cout << " UNHANDLED CHORD TRANSPORT CODE! ... ASSERTING" << endl;
 		assert(this->getCode());

@@ -30,7 +30,9 @@ ChordNode::ChordNode(){
 
 /* Constructor */
 ChordNode::ChordNode(const string &ip, int port, const string &overlayIdentifier, const string &rootDirectory) {
-
+        
+        startTime=time(nullptr);
+    
 	// Define the address space size
 	spacesize = 9;
 
@@ -339,6 +341,32 @@ bool ChordNode::getQueryForHash(string hash, Query *query) {
     }
 }
 
+Node* ChordNode::getNodeForIP(string ip) {
+    vector<Node*>::iterator it;
+    for(it=fingerTable.begin();it!=fingerTable.end();it++){
+        if((*it)->getIp().compare(ip)==0)
+            return (*it);
+    }
+    return NULL;
+}
+
+
+vector<Node*> ChordNode::getPassedQueryForHash(string hash) {
+    map<string,vector<Node*>>::iterator it;
+    vector<Node*> returnVec;
+    for(it=passedQueries.begin();it!=passedQueries.end();it++){
+        if((*it).first.compare(hash)==0){
+            return (*it).second;
+        }
+    }
+    return returnVec;
+}
+
+void ChordNode::addPassedQuery(string hash, vector<Node*> predSucc) {
+    passedQueries[hash]=predSucc;
+}
+
+
 
 /* Stop the stabilization, distribute the key and shutDown the peer */
 void ChordNode::shutDown() {
@@ -508,11 +536,17 @@ string ChordNode::send_request_with_timeout(Node *selectedNode,transportCode tr,
         return string("");
 }
 
-void ChordNode::randomWalk(){   
+
+/*
+ * Insert dummy query
+ * 
+ */
+void ChordNode::randomWalk(string key){   
     Query *query=new Query(1,1);
     allQueries.push_back(query);
     query->addFingerTable(fingerTable,thisNode);
-    
+    char *buffer;
+
     //Faze one
     for(int iterator=0;iterator<query->getL();iterator){
         vector<Node *> currentTable=query->getLastFingerTableEntry();
@@ -540,16 +574,24 @@ void ChordNode::randomWalk(){
     }//at the end in selectedNodes we will have the chain of nodes
     
     //Faze two
-    
-    //se va contacta ultimul nod din prima parte pentru a selecta o serie de noduri
+        
     Node* A=query->getSelectedNodes().front();//get first selected nod of first part of random walk
     
     ChordNode *tempNode=new ChordNode();
-    tempNode->setFingerTable(query->getSelectedNodes());
+    tempNode->setFingerTable(query->getSelectedNodes());//Crypt nodes in getSelectedNodes with all the node keys
     
     map<string,string> queryParams;
     queryParams["table"]=tempNode->serialize(tempNode);
-       
+    queryParams["hash"]=query->getQueryHash();
+    queryParams["l"]=string(itoa(query->getL(),buffer,10));
+    queryParams["key"]=key;//SHOULD BE CRIPTED WITH LAST NODE KEY
+
+    //queryParams["public_key"] for last node to crypt the selected nodes
+
+    
     string response = send_request_with_timeout(A,RANDOMWALKCONTACT,10,queryParams);   
+    //inside response are NODES or fail
+    
+    
     cout<<response.c_str();
 }

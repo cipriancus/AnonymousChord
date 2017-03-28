@@ -35,6 +35,7 @@ OBJECTDIR=${CND_BUILDDIR}/${CND_CONF}/${CND_PLATFORM}
 
 # Object Files
 OBJECTFILES= \
+	${OBJECTDIR}/helper/HELPER.o \
 	${OBJECTDIR}/helper/HTTP_Client.o \
 	${OBJECTDIR}/helper/crypto/sha1.o \
 	${OBJECTDIR}/helper/crypto/tomcrypt/algorithms/crypt_argchk.o \
@@ -81,6 +82,11 @@ ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/libanonymouschordlibrary.a: ${OBJECTF
 	${RM} ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/libanonymouschordlibrary.a
 	${AR} -rv ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/libanonymouschordlibrary.a ${OBJECTFILES} 
 	$(RANLIB) ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/libanonymouschordlibrary.a
+
+${OBJECTDIR}/helper/HELPER.o: helper/HELPER.cpp
+	${MKDIR} -p ${OBJECTDIR}/helper
+	${RM} "$@.d"
+	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/helper/HELPER.o helper/HELPER.cpp
 
 ${OBJECTDIR}/helper/HTTP_Client.o: helper/HTTP_Client.cpp
 	${MKDIR} -p ${OBJECTDIR}/helper

@@ -33,6 +33,7 @@
 #include <stdio.h>
 #include <errno.h>
 #include <string.h>
+#include "Query.h"
 
 class AbstractChord: public IOverlay
 {
@@ -120,7 +121,6 @@ protected:
 	/** Time between each stabilization/fix fingerstable */
 	int timeToCheck;        
                
-          
 };
 
 #endif

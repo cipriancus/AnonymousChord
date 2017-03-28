@@ -67,6 +67,8 @@
           <itemPath>helper/thread/Thread.h</itemPath>
           <itemPath>helper/thread/TimeHelper.h</itemPath>
         </logicalFolder>
+        <itemPath>helper/HELPER.cpp</itemPath>
+        <itemPath>helper/HELPER.h</itemPath>
         <itemPath>helper/HTTP_Client.cpp</itemPath>
         <itemPath>helper/HTTP_Client.h</itemPath>
       </logicalFolder>
@@ -153,6 +155,10 @@
         <archiverTool>
         </archiverTool>
       </compileType>
+      <item path="helper/HELPER.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="helper/HELPER.h" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="helper/HTTP_Client.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="helper/HTTP_Client.h" ex="false" tool="3" flavor2="0">
@@ -392,6 +398,10 @@
         <archiverTool>
         </archiverTool>
       </compileType>
+      <item path="helper/HELPER.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="helper/HELPER.h" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="helper/HTTP_Client.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="helper/HTTP_Client.h" ex="false" tool="3" flavor2="0">

@@ -6,9 +6,9 @@ build/Debug/GNU-Linux/p2p/transport/http/TransportHTTP.o: \
  helper/mongoose_http_server/mongoose.h p2p/protocols/chord/ChordNode.h \
  p2p/transport/IOverlay.h p2p/transport/ITransport.h \
  p2p/protocols/chord/AbstractChord.h \
- p2p/protocols/chord/ChordTransportCode.h \
- p2p/transport/http/TransportHTTP.h p2p/protocols/chord/Query.h \
- helper/crypto/sha1.h helper/mongoose_http_server/callbacks/callbacks.h \
+ p2p/protocols/chord/ChordTransportCode.h p2p/protocols/chord/Query.h \
+ helper/crypto/sha1.h p2p/transport/http/TransportHTTP.h \
+ helper/mongoose_http_server/callbacks/callbacks.h \
  p2p/protocols/chord/AbstractChord.h \
  helper/mongoose_http_server/callbacks/chord_callbacks.h \
  p2p/transport/http/http_operations.h p2p/protocols/ProtocolSingleton.h \
@@ -38,11 +38,11 @@ p2p/protocols/chord/AbstractChord.h:
 
 p2p/protocols/chord/ChordTransportCode.h:
 
-p2p/transport/http/TransportHTTP.h:
-
 p2p/protocols/chord/Query.h:
 
 helper/crypto/sha1.h:
+
+p2p/transport/http/TransportHTTP.h:
 
 helper/mongoose_http_server/callbacks/callbacks.h:
 
