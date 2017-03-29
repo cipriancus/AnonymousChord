@@ -15,16 +15,16 @@
 
 long int HELPER::deserializeLongInt(string data) {
     long int x;
-    istringstream ifs(data);
-    boost::archive::text_iarchive ia(ifs);
-    ia>>x;
+//    istringstream ifs(data);
+//    boost::archive::text_iarchive ia(ifs);
+//    ia>>x;
     return x;
 }
 
 string HELPER::serializeLongInt(long int x) {
     ostringstream ofs;
-    boost::archive::text_oarchive oa(ofs);   
-    ofs.flush();
-    oa<<x;
+//    boost::archive::text_oarchive oa(ofs);   
+//    ofs.flush();
+//    oa<<x;
     return ofs.str();
 }

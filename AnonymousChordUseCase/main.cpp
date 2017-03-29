@@ -35,7 +35,7 @@ int main(int argc, char * const argv[])
 //                    cout<<node->verifyNodeSignature(node->getThisNode(),node->getThisNode()->getSignature(),chord);
 		}
                 
- /*
+ 
 		char entry[256];
 		string key;
 		string value;
@@ -76,12 +76,12 @@ int main(int argc, char * const argv[])
     			default:
 				break;
 			}         
-	    }*/
-        string key;
-    	cin >> key;
-
-        sleep(5);
-        node->randomWalk(key);
+	    }
+//        string key;
+//    	cin >> key;
+//
+//        sleep(5);
+//        node->randomWalk(key);
           
 
     } else {
