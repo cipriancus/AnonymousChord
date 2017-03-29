@@ -84,7 +84,7 @@ void TransportHTTP::initCallbacks() {
                 mg_set_uri_callback(ctx, "/getfingertable", &call_chord_getfingertable, NULL);
                 mg_set_uri_callback(ctx, "/randomwalkcontact", &call_chord_contact, NULL);
                 mg_set_uri_callback(ctx, "/getnewnode", &call_chord_getNewNode, NULL);
-                mg_set_uri_callback(ctx, "/getonlinetime", &call_chord_getOnlineTime, NULL)
+                mg_set_uri_callback(ctx, "/getonlinetime", &call_chord_getOnlineTime, NULL);
                 mg_set_uri_callback(ctx, "/randomwalkgetkey", &call_chord_getkey, NULL);
 ;
 
