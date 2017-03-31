@@ -35,6 +35,7 @@ public:
 	ChordNode*	getChordNode() { return myNode; }
 	CertificationAuthority*	getCA() { return myCA; }
         string getMode()  {return mode;}
+
 protected:
 	ProtocolSingleton();
 	

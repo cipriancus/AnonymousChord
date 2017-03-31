@@ -252,6 +252,17 @@ void ChordNode::removekey(string key) {
 	}
 }
 
+string ChordNode::getDataOrPrecedingNode(char *id) {
+    if (insideRange(atoi(id), predecessor->getId() + 1, thisNode->getId())) {
+        // I'm responsible for this key
+	return openData(string(id));
+    }
+    Node *node = closestPrecedingNode(atoi(id));
+    
+    return node->serializeNode();
+}
+
+
 /* Convert a string into an integer in [0, spacesize] */
 unsigned int ChordNode::getIntSHA1(string str) {
 	SHA1 *sha1 = new SHA1();
@@ -365,8 +376,6 @@ vector<Node*> ChordNode::getPassedQueryForHash(string hash) {
 void ChordNode::addPassedQuery(string hash, vector<Node*> predSucc) {
     passedQueries[hash]=predSucc;
 }
-
-
 
 /* Stop the stabilization, distribute the key and shutDown the peer */
 void ChordNode::shutDown() {
@@ -541,13 +550,41 @@ string ChordNode::send_request_with_timeout(Node *selectedNode,transportCode tr,
  * Insert dummy query
  * 
  */
-void ChordNode::randomWalk(string key){   
+string ChordNode::randomWalk(string key){   
+    int hKey = getIntSHA1(key);
+    if (insideRange(hKey, predecessor->getId() + 1, thisNode->getId())) {
+	// I'm responsible for this key
+	return openData(key);
+    }
+    
     Query *query=new Query(1,1);
     allQueries.push_back(query);
     query->addFingerTable(fingerTable,thisNode);
     char *buffer;
 
-    //Faze one
+    phaseOne(query);
+    
+    
+    Node* A=query->getSelectedNodes().front();//get first selected nod of first part of random walk
+    
+    ChordNode *tempNode=new ChordNode();
+    tempNode->setFingerTable(query->getSelectedNodes());//Crypt nodes in getSelectedNodes with all the node keys
+    
+    map<string,string> queryParams;
+    queryParams["table"]=tempNode->serialize(tempNode);
+    queryParams["hash"]=query->getQueryHash();
+    queryParams["l"]=string(itoa(query->getL(),buffer,10));
+    queryParams["id"]=hKey;//SHOULD BE CRIPTED WITH LAST NODE KEY
+    queryParams["enumeration_command"]=string(P_SINGLETON->getChordNode()->itoa(13,buffer,10));//13=RANDOMWALKCONTACT
+    //queryParams["public_key"] for last node to crypt the selected nodes
+
+    string response = send_request_with_timeout(A,RANDOMWALKCONTACT,10,queryParams);//inside response are NODES or fail
+    
+    cout<<response.c_str();
+}
+
+void ChordNode::phaseOne(Query *query){
+     //Faze one
     for(int iterator=0;iterator<query->getL();iterator){
         vector<Node *> currentTable=query->getLastFingerTableEntry();
         
@@ -572,26 +609,4 @@ void ChordNode::randomWalk(string key){
             iterator++;
         }   
     }//at the end in selectedNodes we will have the chain of nodes
-    
-    //Faze two
-        
-    Node* A=query->getSelectedNodes().front();//get first selected nod of first part of random walk
-    
-    ChordNode *tempNode=new ChordNode();
-    tempNode->setFingerTable(query->getSelectedNodes());//Crypt nodes in getSelectedNodes with all the node keys
-    
-    map<string,string> queryParams;
-    queryParams["table"]=tempNode->serialize(tempNode);
-    queryParams["hash"]=query->getQueryHash();
-    queryParams["l"]=string(itoa(query->getL(),buffer,10));
-    queryParams["key"]=key;//SHOULD BE CRIPTED WITH LAST NODE KEY
-
-    //queryParams["public_key"] for last node to crypt the selected nodes
-
-    
-    string response = send_request_with_timeout(A,RANDOMWALKCONTACT,10,queryParams);   
-    //inside response are NODES or fail
-    
-    
-    cout<<response.c_str();
 }

@@ -10,23 +10,24 @@
 #define CHORD_TRANSPORT_CODE_H
 
 typedef enum {
-	GETPRED = 0, //GETPRED
-	FINDSUCC, //FINDSUCC,<id>
-	NOTIF, //NOTIF,<ip>,<id>,<port>
-	JOIN,
-	PUT,
-	GET,
-	REMOVEKEY,
-	SETSUCC,
-	SETPRED,
-	CHECKPRED,
-        SIGNOD,
-        SIGVERIFY,
-        GETFINGERTABLE,//get finger table from a node
-        RANDOMWALKCONTACT,//call_chord_contact for selecting a path
-        GETNNEWNODE,//get a new node for a random walk
-        GETONLINETIME,
-        RANDOMWALKGETKEY
+	GETPRED = 0, //GETPRED 0
+	FINDSUCC, //FINDSUCC,<id>1
+	NOTIF, //NOTIF,<ip>,<id>,<port>2
+	JOIN,//3
+	PUT,//4
+	GET,//5
+	REMOVEKEY,//6
+	SETSUCC,//7
+	SETPRED,//8
+	CHECKPRED,//9
+        SIGNOD,//10
+        SIGVERIFY,//11
+        GETFINGERTABLE,//get finger table from a node 12
+        RANDOMWALKCONTACT,//call_chord_contact for selecting a path 13
+        GETNNEWNODE,//get a new node for a random walk 14
+        GETONLINETIME,//15
+        RANDOMWALKGETKEY,//16
+        CLOSESTNODETOKEY//17 get closest node to a key
 } transportCode;
 
 #endif

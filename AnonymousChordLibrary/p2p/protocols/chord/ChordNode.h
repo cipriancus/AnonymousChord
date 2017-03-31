@@ -59,7 +59,8 @@ public:
 	void   put(string key, string value);
 	string get(string key);
 	void   removekey(string key);
-
+        string getDataOrPrecedingNode(char *id);
+        
 
 	/* data CRUD */
 	void saveData(string filename, string value);
@@ -79,11 +80,12 @@ public:
         string serialize(ChordNode *node);   
         ChordNode* deserialize(string data);
         bool getQueryForHash(string hash,Query *query);
-        Node* getNodeForIP(string ip);
+        Node* getNodeForIP(string ip);  
         vector<Node*> getPassedQueryForHash(string hash);
         void          addPassedQuery(string hash, vector<Node*> predSucc);
-        void                    randomWalk(string key);
-      
+        string                    randomWalk(string key);
+        void                    phaseOne(Query *query);
+
         friend class boost::serialization::access;
 
         template<class Archive>

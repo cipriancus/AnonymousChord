@@ -31,6 +31,7 @@ using namespace std;
 class Query {
 public:
     Query();
+    Query(int l);
     Query(int min,int max);
     virtual ~Query();
 
@@ -46,7 +47,6 @@ public:
     Node* selectNewNode(vector<Node*> fingerTable);
     
     vector<Node *> getLastFingerTableEntry(){return selectedFingerTables.back();}
-    
 
 private:
     #define P_SINGLETON ProtocolSingleton::getInstance()

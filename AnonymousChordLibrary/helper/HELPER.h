@@ -21,12 +21,15 @@
 #include <string>
 #include <string.h>
 #include <sstream>
+#include "ChordTransportCode.h"
 using namespace std;
 
 class HELPER {
 public: 
     static long int deserializeLongInt(string data);
     static string     serializeLongInt(long int x);
+    static transportCode getEnumForInt(int no);
+
 };
 
 #endif /* HELPER_H */

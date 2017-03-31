@@ -14,8 +14,6 @@
 #include "sha1.h"
 #include "HELPER.h"
 #include <assert.h>
-
-
 /*
  *	/getpred callback, handles a get_predecessor peer request.
  */
@@ -167,6 +165,21 @@ void call_chord_sigverify(struct mg_connection *conn,const struct mg_request_inf
 	mg_free(nid);
 
 }
+
+void call_chord_closestnotetokey(struct mg_connection *conn,
+		const struct mg_request_info *request_info, void *user_data) {
+	string result;
+	char *id = NULL;
+
+	assert((id = mg_get_var(conn, "id")) != NULL);
+        
+        result=P_SINGLETON->getChordNode()->getDataOrPrecedingNode(id);
+	
+	mg_printf(conn, result.c_str());
+
+	mg_free(id);
+}
+
 void call_chord_getfingertable(struct mg_connection *conn,
                 const struct mg_request_info *request_info, void *user_data){    
  
@@ -276,16 +289,19 @@ void call_chord_contact(struct mg_connection *conn,
   char *hashch = NULL;
   char *lch = NULL;
   char *keych = NULL;
+  char *enumcommandch = NULL;
 
   tablech  = mg_get_var(conn, "table");
   assert((hashch = mg_get_var(conn, "hash")) != NULL);
   assert((lch = mg_get_var(conn, "l")) != NULL);
-  assert((keych = mg_get_var(conn, "key")) != NULL);
+  assert((keych = mg_get_var(conn, "id")) != NULL);
+  assert((enumcommandch = mg_get_var(conn, "enumeration_command")) != NULL);
 
   string l=string(lch);
   string tablestr=string(tablech);
   string hash=string(hashch);
   string key=string(keych);
+  string enumcommand=string(enumcommandch);
 
   /*
   ADAUG INFO despre pred si succ 
@@ -312,7 +328,8 @@ void call_chord_contact(struct mg_connection *conn,
         query_params["table"]=tempNode->serialize(tempNode);
         query_params["hash"]=hash;
         query_params["l"]=l;
-        query_params["key"]=key;
+        query_params["id"]=key;
+        query_params["enumeration_command"]=enumcommand;//13=RANDOMWALKCONTACT
 
             string response;
             int times=0;        
@@ -340,15 +357,16 @@ void call_chord_contact(struct mg_connection *conn,
         mg_printf(conn, response.c_str());
     }else{
         //e ultimul nod selectat
-        //ii cer sa initieze faza 2
+        //ii cer sa initieze ceea ce scrie in enumeration_command
         
         map<string,string> query_params;
         query_params["table"]=tempNode->serialize(tempNode);
         query_params["hash"]=hash;
         query_params["l"]=l;
-        query_params["key"]=l;
-
-        string response=P_SINGLETON->getChordNode()->send_request_with_timeout(node,RANDOMWALKGETKEY,noOfSeconds,query_params);
+        query_params["id"]=key;
+        
+        char *buffer;
+        string response=P_SINGLETON->getChordNode()->send_request_with_timeout(node,HELPER::getEnumForInt(atoi(enumcommand.c_str())),noOfSeconds,query_params);
         mg_printf(conn, response.c_str());
     } 
   }
@@ -356,8 +374,72 @@ void call_chord_contact(struct mg_connection *conn,
 
 void call_chord_getkey(struct mg_connection *conn,
                 const struct mg_request_info *request_info, void *user_data){
+  
+    char *tablech = NULL;
+    char *hashch = NULL;
+    char *lch = NULL;
+    char *keych = NULL;
 
+    tablech  = mg_get_var(conn, "table");
+    assert((hashch = mg_get_var(conn, "hash")) != NULL);
+    assert((lch = mg_get_var(conn, "l")) != NULL);
+    assert((keych = mg_get_var(conn, "id")) != NULL);
 
+    string l=string(lch);
+    string tablestr=string(tablech);
+    string hash=string(hashch);
+    string key=string(keych);
+    
+    vector<Node*> predSucc;
+    assert((predSucc[0] = P_SINGLETON->getChordNode()->getNodeForIP(string(returnIP(conn)))) != NULL);
+    predSucc[1]=P_SINGLETON->getChordNode()->getThisNode();
+    P_SINGLETON->getChordNode()->addPassedQuery(hash,predSucc);
+    
+    do{
+        Query *temporaryQuery=new Query(atoi(l.c_str()));
+        
+        P_SINGLETON->getChordNode()->phaseOne(temporaryQuery);//select randomwalk nodes
+        
+        char *buffer;
+        
+        ChordNode *tempNode=new ChordNode();
+        tempNode->setFingerTable(temporaryQuery->getSelectedNodes());
+     
+        Node* node=temporaryQuery->getSelectedNodes().front();
+        
+        map<string,string> queryParams;
+        queryParams["table"]=tempNode->serialize(tempNode);
+        queryParams["hash"]=temporaryQuery->getQueryHash();
+        queryParams["l"]=string(P_SINGLETON->getChordNode()->itoa(temporaryQuery->getL(),buffer,10));
+        queryParams["id"]=key;//SHOULD BE CRIPTED WITH LAST NODE KEY
+        queryParams["enumeration_command"]=string(P_SINGLETON->getChordNode()->itoa(17,buffer,10));//CLOSESTNODETOKEY
+        //queryParams["public_key"] for last node to crypt the selected nodes
+        
+        string response;
+        int times=0;        
+        int noOfSeconds=2;
+
+        do{
+            response=P_SINGLETON->getChordNode()->send_request_with_timeout(node,RANDOMWALKCONTACT,noOfSeconds,queryParams);
+            times++;
+         }while(response.size()!=0 &times<3);
+        
+                if(times==3||response.compare("failed")==0){
+                    //failed
+                    string serializedNode=node->serializeNode();//give the failed node for inspection
+                    queryParams["failed_node"]=serializedNode;//ar trebui criptat cu cheia publica a Query ului ca sa nu fie fazut de toti
+                    queryParams["time_of_fail"]=HELPER::serializeLongInt(time(nullptr));
+                    do{
+                        response=P_SINGLETON->getChordNode()->send_request_with_timeout(predSucc[0],GETNNEWNODE,noOfSeconds,queryParams);
+                        times++;
+                    }while(response.size()!=0 &times<3);
+
+                    if(times==3){
+                        response=string("failed");
+                    }       
+                }
+        //responce has A NODE or a result
+    }while(1);
 }
 
 /*

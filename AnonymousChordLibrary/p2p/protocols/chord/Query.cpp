@@ -12,9 +12,8 @@
 Query::Query(){
     
 }
-
-Query::Query(int min,int max) {
-    l=random(min,max);//l-hop random walk
+Query::Query(int l){
+    this->l=l;
     
     SHA1 *sha1 = new SHA1(); 
     int number=random();
@@ -23,6 +22,11 @@ Query::Query(int min,int max) {
     sha1->addBytes( reinterpret_cast<const char*>(itoa(number,no,10)), strlen(itoa(number,no,10)));  
     this->queryHash=string(reinterpret_cast<const char*>(sha1->getDigest()));
     delete sha1;  
+}
+
+Query::Query(int min,int max) {
+    l=random(min,max);//l-hop random walk
+    Query(l);
 }
 
 Query::~Query() {
