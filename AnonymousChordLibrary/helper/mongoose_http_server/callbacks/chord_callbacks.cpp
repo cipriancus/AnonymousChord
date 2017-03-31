@@ -290,19 +290,21 @@ void call_chord_contact(struct mg_connection *conn,
   char *lch = NULL;
   char *keych = NULL;
   char *enumcommandch = NULL;
+  char *last_nodech = NULL;
 
   tablech  = mg_get_var(conn, "table");
   assert((hashch = mg_get_var(conn, "hash")) != NULL);
   assert((lch = mg_get_var(conn, "l")) != NULL);
   assert((keych = mg_get_var(conn, "id")) != NULL);
   assert((enumcommandch = mg_get_var(conn, "enumeration_command")) != NULL);
+  assert((last_nodech = mg_get_var(conn, "last_node")) != NULL);
 
   string l=string(lch);
   string tablestr=string(tablech);
   string hash=string(hashch);
   string key=string(keych);
   string enumcommand=string(enumcommandch);
-
+  string last_node=string(last_nodech);
   /*
   ADAUG INFO despre pred si succ 
    */
@@ -330,6 +332,7 @@ void call_chord_contact(struct mg_connection *conn,
         query_params["l"]=l;
         query_params["id"]=key;
         query_params["enumeration_command"]=enumcommand;//13=RANDOMWALKCONTACT
+        query_params["last_node"]=last_node;//13=RANDOMWALKCONTACT
 
             string response;
             int times=0;        
@@ -358,6 +361,8 @@ void call_chord_contact(struct mg_connection *conn,
     }else{
         //e ultimul nod selectat
         //ii cer sa initieze ceea ce scrie in enumeration_command
+        Node *contact=new Node();
+        contact=contact->deserializeNode(last_node);
         
         map<string,string> query_params;
         query_params["table"]=tempNode->serialize(tempNode);
@@ -366,7 +371,7 @@ void call_chord_contact(struct mg_connection *conn,
         query_params["id"]=key;
         
         char *buffer;
-        string response=P_SINGLETON->getChordNode()->send_request_with_timeout(node,HELPER::getEnumForInt(atoi(enumcommand.c_str())),noOfSeconds,query_params);
+        string response=P_SINGLETON->getChordNode()->send_request_with_timeout(contact,HELPER::getEnumForInt(atoi(enumcommand.c_str())),noOfSeconds,query_params);
         mg_printf(conn, response.c_str());
     } 
   }
@@ -384,7 +389,8 @@ void call_chord_getkey(struct mg_connection *conn,
     assert((hashch = mg_get_var(conn, "hash")) != NULL);
     assert((lch = mg_get_var(conn, "l")) != NULL);
     assert((keych = mg_get_var(conn, "id")) != NULL);
-
+    
+    string response;
     string l=string(lch);
     string tablestr=string(tablech);
     string hash=string(hashch);
@@ -395,11 +401,13 @@ void call_chord_getkey(struct mg_connection *conn,
     predSucc[1]=P_SINGLETON->getChordNode()->getThisNode();
     P_SINGLETON->getChordNode()->addPassedQuery(hash,predSucc);
     
+    vector<Node*> interogatedNodes;
+    
     do{
         Query *temporaryQuery=new Query(atoi(l.c_str()));
         
         P_SINGLETON->getChordNode()->phaseOne(temporaryQuery);//select randomwalk nodes
-        
+                
         char *buffer;
         
         ChordNode *tempNode=new ChordNode();
@@ -413,9 +421,9 @@ void call_chord_getkey(struct mg_connection *conn,
         queryParams["l"]=string(P_SINGLETON->getChordNode()->itoa(temporaryQuery->getL(),buffer,10));
         queryParams["id"]=key;//SHOULD BE CRIPTED WITH LAST NODE KEY
         queryParams["enumeration_command"]=string(P_SINGLETON->getChordNode()->itoa(17,buffer,10));//CLOSESTNODETOKEY
+        queryParams["last_node"]=interogatedNodes.back()->serializeNode();
         //queryParams["public_key"] for last node to crypt the selected nodes
         
-        string response;
         int times=0;        
         int noOfSeconds=2;
 
@@ -438,8 +446,18 @@ void call_chord_getkey(struct mg_connection *conn,
                         response=string("failed");
                     }       
                 }
-        //responce has A NODE or a result
+            //responce has A NODE
+            Node *response_node=new Node();
+            response_node=response_node->deserializeNode(response);
+            
+            if(response_node->getIp().size()!=0){//if it really had a node
+                interogatedNodes.push_back(response_node);
+            }else{
+                //I have a value for the key
+                break;
+            }
     }while(1);
+    mg_printf(conn, response.c_str());
 }
 
 /*

@@ -575,7 +575,8 @@ string ChordNode::randomWalk(string key){
     queryParams["hash"]=query->getQueryHash();
     queryParams["l"]=string(itoa(query->getL(),buffer,10));
     queryParams["id"]=hKey;//SHOULD BE CRIPTED WITH LAST NODE KEY
-    queryParams["enumeration_command"]=string(P_SINGLETON->getChordNode()->itoa(13,buffer,10));//13=RANDOMWALKCONTACT
+    queryParams["enumeration_command"]=string(P_SINGLETON->getChordNode()->itoa(16,buffer,10));//16=RANDOMWALKGETKEY
+    queryParams["last_node"]=query->getSelectedNodes().back()->serializeNode();//What node to contact at end of random walk
     //queryParams["public_key"] for last node to crypt the selected nodes
 
     string response = send_request_with_timeout(A,RANDOMWALKCONTACT,10,queryParams);//inside response are NODES or fail
