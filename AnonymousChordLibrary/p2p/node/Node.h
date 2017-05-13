@@ -31,7 +31,8 @@ public:
 	Node(const string &ip, unsigned int port);
 	Node(const string &data);
         Node(const string &inIp, unsigned int inId, unsigned int inPort,string inSignature);
-
+        ~Node();
+        
 	bool	equals(Node *node);
 	string	toString();
 	vector<string> tokenize(const string& str, const string& delims);

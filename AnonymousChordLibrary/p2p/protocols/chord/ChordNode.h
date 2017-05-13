@@ -42,7 +42,10 @@ public:
 
 	/* Setters */
 	void setIdentifier(const string &iD) { overlayIdentifier = iD; }
-	void setTransport(TransportHTTP *t)  { transport = t; }
+	string getIdentifier()               { return overlayIdentifier; }	
+
+        TransportHTTP* getTransport()   { return transport; }	
+        void setTransport(TransportHTTP *t)  { transport = t; }
 
 	/* Action Methods */
 	virtual string sendRequest(Request *request, Node* destination);
@@ -73,8 +76,6 @@ public:
 	unsigned int   getIntSHA1(string key);	
         char *getHexSHA1(string str);	
         time_t getStartTime(){return startTime;}
-        string getIdentifier() 			{ return overlayIdentifier; }	
-        TransportHTTP* getTransport()   { return transport; }	
         std::vector<Node*> getFingerTable(){return fingerTable;}   
         Node* getThisNode() 			{ return thisNode; }    
         string serialize(ChordNode *node);   

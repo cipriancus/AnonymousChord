@@ -65,5 +65,7 @@ transportCode HELPER::getEnumForInt(int no){
             return GETONLINETIME;
         case 16:
             return RANDOMWALKGETKEY;
+        case 17:
+            return CLOSESTNODETOKEY;
     }
 }

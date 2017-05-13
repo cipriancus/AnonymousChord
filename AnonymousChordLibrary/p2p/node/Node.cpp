@@ -83,6 +83,10 @@ Node::Node(const string &inData) {
 	this->port = atoi(inPort.c_str());
 }
 
+Node::~Node(){
+    
+}
+
 /*
  *	Action Methods
  */

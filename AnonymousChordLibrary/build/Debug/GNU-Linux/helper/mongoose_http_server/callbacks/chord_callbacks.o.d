@@ -9,7 +9,8 @@ build/Debug/GNU-Linux/helper/mongoose_http_server/callbacks/chord_callbacks.o: \
  p2p/transport/ITransport.h helper/mongoose_http_server/mongoose.h \
  p2p/protocols/ca/CertificationAuthority.h \
  p2p/transport/http/http_operations.h helper/HTTP_Client.h \
- helper/HELPER.h p2p/protocols/chord/ChordTransportCode.h
+ helper/HELPER.h p2p/protocols/chord/ChordTransportCode.h \
+ helper/thread/Exception.h
 
 helper/mongoose_http_server/callbacks/chord_callbacks.h:
 
@@ -48,3 +49,5 @@ helper/HTTP_Client.h:
 helper/HELPER.h:
 
 p2p/protocols/chord/ChordTransportCode.h:
+
+helper/thread/Exception.h:

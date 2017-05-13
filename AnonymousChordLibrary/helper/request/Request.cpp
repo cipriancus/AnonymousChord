@@ -113,6 +113,9 @@ string Request::serialize() {
         case RANDOMWALKGETKEY:
 		callback = new string("/randomwalkgetkey");
 		break;
+        case CLOSESTNODETOKEY:
+		callback = new string("/closestnodetokey");
+		break;
 	default:
 		cout << " UNHANDLED CHORD TRANSPORT CODE! ... ASSERTING" << endl;
 		assert(this->getCode());
