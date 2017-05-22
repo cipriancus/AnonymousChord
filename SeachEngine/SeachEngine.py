@@ -12,6 +12,16 @@ def route_main_page():
     return render_template('index.html')
 
 
+@app.route('/jobs')
+def route_jobs_page():
+    return render_template('jobs.html')
+
+
+@app.route('/addjob')
+def route_add_job_page():
+    return render_template('addjob.html')
+
+
 @app.route('/<path:path>')
 def static_proxy(path):
     return app.send_static_file(path)
@@ -23,11 +33,11 @@ def anonymous_flag():
     anonymousFlag = request.get_json()
     return str(anonymousFlag)
 
-@app.route('/getnodes', methods=['POST'])
+
+@app.route('/getnodes', methods=['GET'])
 def get_nodes():
     global chordNode
-    list_of_nodes=chordNode.get_connected_nodes()
-    return ''
+    return chordNode.get_connected_nodes()
 
 
 @app.route('/search', methods=['POST'])

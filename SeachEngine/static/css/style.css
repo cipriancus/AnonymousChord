@@ -1,99 +1,113 @@
 body {
-  padding-top: 20px;
-  padding-bottom: 20px;
+    padding-top: 20px;
+    padding-bottom: 20px;
 }
+
 .header,
 .marketing,
 .footer {
-  padding-right: 15px;
-  padding-left: 15px;
+    padding-right: 15px;
+    padding-left: 15px;
 }
+
 /* Custom page header */
 .header {
-  padding-bottom: 20px;
-  border-bottom: 1px solid #e5e5e5;
+    padding-bottom: 20px;
+    border-bottom: 1px solid #e5e5e5;
 }
+
 .header h3 {
-  margin-top: 0;
-  margin-bottom: 0;
-  line-height: 40px;
+    margin-top: 0;
+    margin-bottom: 0;
+    line-height: 40px;
 }
 
-.header a{
-  color: inherit; /* blue colors for links too */
-  text-decoration: inherit; /* no underline */
-  padding: 0;
+.header a {
+    color: inherit; /* blue colors for links too */
+    text-decoration: inherit; /* no underline */
+    padding: 0;
 }
 
-.dropdown .btn-default{
+.dropdown .btn-default {
     background-image: none;
-    width:100%;
+    width: 100%;
 }
 
 .footer {
-  padding-top: 19px;
-  color: #777;
-  border-top: 1px solid #e5e5e5;
+    padding-top: 19px;
+    color: #777;
+    border-top: 1px solid #e5e5e5;
 }
+
 @media (min-width: 768px) {
-  .container {
-    max-width: 730px;
-  }
+    .container {
+        max-width: 730px;
+    }
 }
+
 .container-narrow > hr {
-  margin: 30px 0;
+    margin: 30px 0;
 }
+
 .jumbotron {
-  background-color:#FFF;
-  text-align: center;
-  border-bottom: 1px solid #e5e5e5;
+    background-color: #FFF;
+    text-align: center;
+    border-bottom: 1px solid #e5e5e5;
 }
+
 .jumbotron .search_button .btn {
-  padding: 10px 22px;
-  font-size: 18px;
+    padding: 10px 22px;
+    font-size: 18px;
 }
-.jumbotron #jumbotron_content label h3{
+
+.jumbotron #jumbotron_content label h3 {
     display: inline;
 }
-.form-control{
-  margin: 2%;
-}
-.navigation{
 
-}
-.footer-links li{
-  border-right: solid 2px #d3d3d3;
-  text-align: right;
-  padding-left:5px;
-  padding-right: 5px;
+.form-control {
+    margin: 2%;
 }
 
-.footer li a{
-  color: inherit; /* blue colors for links too */
-  text-decoration: inherit; /* no underline */
-  padding: 0;
+.navigation {
+
 }
+
+.footer-links li {
+    border-right: solid 2px #d3d3d3;
+    text-align: right;
+    padding-left: 5px;
+    padding-right: 5px;
+}
+
+.footer li a {
+    color: inherit; /* blue colors for links too */
+    text-decoration: inherit; /* no underline */
+    padding: 0;
+}
+
 /* Responsive: Portrait tablets and up */
 @media screen and (min-width: 768px) {
-  /* Remove the padding we set earlier */
-  .header,
-  .marketing,
-  .footer {
-    padding-right: 0;
-    padding-left: 0;
-  }
-  /* Space out the masthead */
-  .header {
-    margin-bottom: 30px;
-  }
-  /* Remove the bottom border on the jumbotron for visual effect */
-  .jumbotron {
-    border-bottom: 0;
-  }
+    /* Remove the padding we set earlier */
+    .header,
+    .marketing,
+    .footer {
+        padding-right: 0;
+        padding-left: 0;
+    }
+
+    /* Space out the masthead */
+    .header {
+        margin-bottom: 30px;
+    }
+
+    /* Remove the bottom border on the jumbotron for visual effect */
+    .jumbotron {
+        border-bottom: 0;
+    }
 }
 
 .loader {
-    margin-top:5%;
+    margin-top: 5%;
     border: 16px solid #f3f3f3; /* Light grey */
     border-top: 16px solid #3498db; /* Blue */
     border-radius: 50%;
@@ -103,8 +117,28 @@ body {
 }
 
 @keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+.glyphicon-user:before {
+    margin-right: 5px;
+}
+
+.glyphicon-info-sign:before {
+    margin-right: 5px;
+}
+
+.glyphicon-envelope:before {
+    margin-right: 5px;
+}
+
+.glyphicon-home:before {
+    margin-right: 5px;
 }
 
 .glyphicon.glyphicon-one-fine-dot:before {
@@ -121,4 +155,27 @@ body {
     color: red;
     margin-right: 5px;
     margin-left: -1px;
+}
+
+.job_class .job_inner_class h1:first-of-type {
+    text-align: center;
+}
+
+.job_class .job_inner_class .job_list {
+    margin-left: 5%;
+}
+
+.job_class .job_inner_class h4 {
+    margin-left: 3%;
+}
+
+.job_class .job_inner_class #add_job_button {
+    margin: 5% 0 5% 10%;
+    background: #fff;
+}
+
+.job_class .job_inner_class input, textarea {
+    margin-bottom: 2%;
+    border: dotted 1px;
+
 }

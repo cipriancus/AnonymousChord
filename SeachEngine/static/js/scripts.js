@@ -1,7 +1,20 @@
 $(document).ready(function () {
     var anonymous_flag = false;
-    var page_load=1;
+    var page_load = 1;
 
+    $.ajax({
+        type: "GET",
+        url: "/getnodes",
+        contentType: 'application/json;charset=UTF-8',
+        success: function (result) {
+            var ips = result.split(" ");
+
+            for (i = 0; i < ips.length; i++) {
+                if (ips[i].length > 0)
+                    $('#ul_info').append('<li><a href=\"#\"><span class=\"glyphicon glyphicon-one-fine-dot\"><\/span>' + ips[i] + '<\/a></li>')
+            }
+        }
+    });
 
     $(function () {
         if (anonymous_flag == false)
@@ -27,7 +40,7 @@ $(document).ready(function () {
     });
 
     $('#anonymous-toggle').change(function () {
-        if(page_load==0) {
+        if (page_load == 0) {
             anonymous_flag = !anonymous_flag;
 
             $.ajax({
@@ -45,8 +58,58 @@ $(document).ready(function () {
                     }
                 }
             });
-        }else{
-            page_load=0;
+        } else {
+            page_load = 0;
         }
+    });
+
+    $('#send_new_job').click(function () {
+        var title = $('#job_title').val();
+        var keywords = $('#job_keywords').val();
+        var description = $('#job_description').val();
+        var has_error = false;
+
+        if (title.length < 3) {
+            $('#job_title').css('border-color', 'red');
+            has_error=true;
+        } else {
+            $('#job_title').css('border-color', 'black');
+        }
+
+        if (keywords.length < 3) {
+            $('#job_keywords').css('border-color', 'red');
+            has_error=true;
+        } else {
+            $('#job_keywords').css('border-color', 'black');
+        }
+
+        if (description.length < 20) {
+            $('#job_description').css('border-color', 'red');
+            has_error=true;
+        } else {
+            $('#job_description').css('border-color', 'black');
+        }
+
+        if(has_error==true)
+            return;
+
+
+        window.location.href = 'jobs';
+    });
+
+    $('#job_dropdown').click(function () {
+        window.location.href = 'jobs';
+    });
+
+    $('#home_button').click(function () {
+        window.location.href = '/';
+    });
+
+    $('#messanger_dropdown').click(function () {
+
+    });
+
+    $('#add_job_button').click(function () {
+        window.location.href = 'addjob';
     });
 });

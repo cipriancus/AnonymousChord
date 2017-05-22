@@ -1,6 +1,8 @@
 import socket
 import subprocess
 from threading import Thread
+import cgi
+import Helper
 
 '''
     Server commands:
@@ -60,9 +62,11 @@ class AnonymousChordClient():
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         s.connect((self.server_ip, self.server_port))
         s.send(bytes('getallnodes'))
-        no_of_ch=s.recv(4)
-        all_nodes=s.recv(no_of_ch)
+        no_of_ch = s.recv(8)
+        no_of_ch = int(Helper.get_only_characters(no_of_ch))
+        all_nodes = s.recv(no_of_ch)
         s.close()
+        return str(all_nodes)
 
     def delete(self, key):
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -90,7 +94,8 @@ class CppServerThread(Thread):
         # start C++ server with arguments ip port rootDirectory backbone_server_ip
         self.p = subprocess.Popen(
             ["./ChordFiles/AnonymousChordUseCase/dist/Debug/GNU-Linux/anonymouschordusecase " + self.my_ip +
-             " " + str(self.port) + " " + self.backbone_server_ip], shell=True,cwd='/home/ciprian/Desktop/SeachEngine/')
+             " " + str(self.port) + " " + self.backbone_server_ip], shell=True,
+            cwd='/home/ciprian/Desktop/SeachEngine/')
 
     def stop(self):
         self.p.kill()

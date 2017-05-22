@@ -39,8 +39,6 @@ void child(int client, char * const argv[]);
 
 int main(int argc, char * const argv[]) {
 
-    cout << argv[0] << " " << argv[1] << " " << argv[2] << " " << argv[3] << " " << argv[4] << " " << argv[5] << " ";
-
     // This application receives args, "ip", "port", "overlay identifier (unique string)", "root directory)"
     chord = P_SINGLETON->initChordNode(std::string(argv[1]), atoi(argv[2]), std::string("AnonymousChord"), std::string("//"));
     node = new Node(std::string(argv[3]), 8000);
@@ -128,13 +126,6 @@ void child(int client, char * const argv[]) {
             return; /* continuam sa ascultam */
         }
 
-
-        if (read(client, key, 100) <= 0) {
-            perror("[server]Eroare la read() de la client.\n");
-            close(client); /* inchidem conexiunea cu clientul */
-            return; /* continuam sa ascultam */
-        }
-
         if (strcmp(comanda, "exit") == 0) {
             delete node;
             delete chord;
@@ -143,6 +134,13 @@ void child(int client, char * const argv[]) {
         }
 
         if (strcmp(comanda, "get") == 0) {
+
+            if (read(client, key, 100) <= 0) {
+                perror("[server]Eroare la read() de la client.\n");
+                close(client); /* inchidem conexiunea cu clientul */
+                return; /* continuam sa ascultam */
+            }
+
             string value = chord->get(string(key));
 
             if (write(client, value.c_str(), 100) <= 0) {
@@ -151,6 +149,14 @@ void child(int client, char * const argv[]) {
             }
         } else
             if (strcmp(comanda, "put") == 0) {
+
+
+            if (read(client, key, 100) <= 0) {
+                perror("[server]Eroare la read() de la client.\n");
+                close(client); /* inchidem conexiunea cu clientul */
+                return; /* continuam sa ascultam */
+            }
+
             char value[100];
             if (read(client, &value, sizeof ( value)) <= 0) {
                 perror("[AnonCH.Server]Error at client read.\n");
@@ -161,9 +167,23 @@ void child(int client, char * const argv[]) {
             cout << key << " " << value << endl;
         } else
             if (strcmp(comanda, "remove") == 0) {
+
+            if (read(client, key, 100) <= 0) {
+                perror("[server]Eroare la read() de la client.\n");
+                close(client); /* inchidem conexiunea cu clientul */
+                return; /* continuam sa ascultam */
+            }
+
             chord->removekey(key);
         } else
             if (strcmp(comanda, "randomWalk") == 0) {
+
+            if (read(client, key, 100) <= 0) {
+                perror("[server]Eroare la read() de la client.\n");
+                close(client); /* inchidem conexiunea cu clientul */
+                return; /* continuam sa ascultam */
+            }
+
             string value = chord->randomWalk(string(key));
 
             if (write(client, value.c_str(), 100) <= 0) {
@@ -172,18 +192,21 @@ void child(int client, char * const argv[]) {
             }
         } else
             if (strcmp(comanda, "getallnodes") == 0) {
-            vector<Node*> nodeFingerTable=chord->getFingerTable();
-            
+            vector<Node*> nodeFingerTable = chord->getFingerTable();
+
             string value;
-            
+
             vector<Node*>::iterator it;
-            
-            for(it=nodeFingerTable.begin();it!=nodeFingerTable.end();it++){
-                if(value.find(*it->getIp())!=string::npos)
-                    value=value+" "+*it->getIp();
+
+            for (it = nodeFingerTable.begin(); it != nodeFingerTable.end(); it++) {
+                if (value.find((*it)->getIp()) == string::npos)
+                    value = value + " " + (*it)->getIp();
             }
             
-            if (write(client, value.length(), sizeof(int)) <= 0) {
+            char *buff;
+            string length=string(chord->itoa(value.length(),buff,10));
+            
+            if (write(client, length.c_str(), 8 ) <= 0) {
                 perror("[server]Eroare la write() catre client.\n");
                 return;
             }
