@@ -114,8 +114,8 @@ void child(int client, char * const argv[]) {
     while (1) {
 
         char comanda[100];
-        char key[100];
-        bzero(key, 100);
+        char key[1100];
+        bzero(key, 1100);
         bzero(comanda, 100);
         fflush(stdout);
 
@@ -135,7 +135,7 @@ void child(int client, char * const argv[]) {
 
         if (strcmp(comanda, "get") == 0) {
 
-            if (read(client, key, 100) <= 0) {
+            if (read(client, key, 1100) <= 0) {
                 perror("[server]Eroare la read() de la client.\n");
                 close(client); /* inchidem conexiunea cu clientul */
                 return; /* continuam sa ascultam */
@@ -143,7 +143,7 @@ void child(int client, char * const argv[]) {
 
             string value = chord->get(string(key));
 
-            if (write(client, value.c_str(), 100) <= 0) {
+            if (write(client, value.c_str(), 5100) <= 0) {
                 perror("[server]Eroare la write() catre client.\n");
                 return;
             }
@@ -151,24 +151,23 @@ void child(int client, char * const argv[]) {
             if (strcmp(comanda, "put") == 0) {
 
 
-            if (read(client, key, 100) <= 0) {
+            if (read(client, key, 1100) <= 0) {
                 perror("[server]Eroare la read() de la client.\n");
                 close(client); /* inchidem conexiunea cu clientul */
                 return; /* continuam sa ascultam */
             }
 
-            char value[100];
+            char value[5100];
             if (read(client, &value, sizeof ( value)) <= 0) {
                 perror("[AnonCH.Server]Error at client read.\n");
                 return;
             }
 
             chord->put(key, string(value));
-            cout << key << " " << value << endl;
         } else
             if (strcmp(comanda, "remove") == 0) {
 
-            if (read(client, key, 100) <= 0) {
+            if (read(client, key, 1100) <= 0) {
                 perror("[server]Eroare la read() de la client.\n");
                 close(client); /* inchidem conexiunea cu clientul */
                 return; /* continuam sa ascultam */
@@ -178,7 +177,7 @@ void child(int client, char * const argv[]) {
         } else
             if (strcmp(comanda, "randomWalk") == 0) {
 
-            if (read(client, key, 100) <= 0) {
+            if (read(client, key, 1100) <= 0) {
                 perror("[server]Eroare la read() de la client.\n");
                 close(client); /* inchidem conexiunea cu clientul */
                 return; /* continuam sa ascultam */
@@ -186,7 +185,7 @@ void child(int client, char * const argv[]) {
 
             string value = chord->randomWalk(string(key));
 
-            if (write(client, value.c_str(), 100) <= 0) {
+            if (write(client, value.c_str(), 5100) <= 0) {
                 perror("[server]Eroare la write() catre client.\n");
                 return;
             }
@@ -203,7 +202,7 @@ void child(int client, char * const argv[]) {
                     value = value + " " + (*it)->getIp();
             }
             
-            char *buff;
+            char buff[100];
             string length=string(chord->itoa(value.length(),buff,10));
             
             if (write(client, length.c_str(), 8 ) <= 0) {

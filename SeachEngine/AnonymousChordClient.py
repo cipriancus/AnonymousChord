@@ -1,9 +1,8 @@
 import socket
 import subprocess
 from threading import Thread
-import cgi
-import Helper
-
+from Helper import Helper
+from struct import pack
 '''
     Server commands:
         exit
@@ -43,8 +42,10 @@ class AnonymousChordClient():
     def get(self, key):
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         s.connect((self.server_ip, self.server_port))
-        s.send(bytes('get'))
-        s.send(bytes(key))
+        data = pack('!%ds' % 100, 'get')
+        s.send(bytes(data))
+        data = pack('!%ds' % 1100, str(key))
+        s.send(bytes(data))
         response = s.recv(100)
         response = str(response)
         s.close()
@@ -53,10 +54,12 @@ class AnonymousChordClient():
     def put(self, key, value):
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         s.connect((self.server_ip, self.server_port))
-        s.send(bytes('put'))
-        s.send(bytes(key))
-        s.send(bytes(value))
-        s.close()
+        data = pack('!%ds' % 100, 'put')
+        s.send(bytes(data))
+        data = pack('!%ds' % 1100, str(key))
+        s.send(bytes(data))
+        data = pack('!%ds' % 5100, str(value))
+        s.send(bytes(data))
 
     def get_connected_nodes(self):
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -71,8 +74,10 @@ class AnonymousChordClient():
     def delete(self, key):
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         s.connect((self.server_ip, self.server_port))
-        s.send(bytes('delete'))
-        s.send(bytes(key))
+        data = pack('!%ds' % 100, 'remove')
+        s.send(bytes(data))
+        data = pack('!%ds' % 1100, str(key))
+        s.send(bytes(data))
         s.close()
 
     def anonymous_get(self, key):
@@ -107,4 +112,3 @@ class CppServerThread(Thread):
 if __name__ == '__main__':
     x = AnonymousChordClient('192.168.0.105')
     x.start_server()
-    x.put('77', '15')

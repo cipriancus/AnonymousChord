@@ -169,7 +169,7 @@ body {
     margin-left: 3%;
 }
 
-.job_class .job_inner_class #add_job_button {
+.job_class .job_inner_class #add_job_button,.send_button {
     margin: 5% 0 5% 10%;
     background: #fff;
 }
