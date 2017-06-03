@@ -46,7 +46,7 @@ class AnonymousChordClient():
         s.send(bytes(data))
         data = pack('!%ds' % 1100, str(key))
         s.send(bytes(data))
-        response = s.recv(100)
+        response = s.recv(5100)
         response = str(response)
         s.close()
         return response

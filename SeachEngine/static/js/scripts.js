@@ -56,28 +56,7 @@ $(document).ready(function () {
                         entry_no++;
                     }
                 }
-
-                $('.edit_button').click(function () {
-                    var id = $(this).closest('div').data('id');
-
-                    window.location.href = 'editjob?id=' + id;
-                });
-
-                $('.delete_button').click(function () {
-                    var id = $(this).closest('div').data('id');
-
-                    $.ajax({
-                        type: "POST",
-                        url: "/deletejob",
-                        data: JSON.stringify(id, null, '\t'),
-                        contentType: 'application/json;charset=UTF-8',
-                        success: function (result) {
-                            if (result == 'ok') {
-                                location.reload();
-                            }
-                        }
-                    });
-                });
+                edit_job_edit_delete_click();
             }
         });
     }
@@ -150,6 +129,55 @@ $(document).ready(function () {
         });
     }
 
+    if (top.location.pathname == '/viewjob') {
+        var id = getParameterByName('id');
+
+        $.ajax({
+            type: "POST",
+            url: "/getJobById",
+            data: JSON.stringify(id, null, '\t'),
+            contentType: 'application/json;charset=UTF-8',
+            success: function (result) {
+                var splits = result.split('#');
+
+                var id = splits[0];
+                var title = splits[1];
+                var keywords = splits[2];
+                var description = splits[3];
+
+                $('#job_title').val(title)
+                $('#job_keywords').val(keywords);
+                $('#job_description').val(description);
+            }
+        });
+    }
+
+    if (top.location.pathname == '/history') {
+        $.ajax({
+            type: "GET",
+            url: "/getHistory",
+            data: JSON.stringify(id, null, '\t'),
+            contentType: 'application/json;charset=UTF-8',
+            success: function (result) {
+                var entry_no = 1;
+                var index;
+
+                result = result.split('~');
+
+                for (index = 0; index < result.length; ++index) {
+                    if (result[index].length > 0) {
+                        var splits = result[index].split('#');
+                        var id = splits[0];
+                        var title = splits[1];
+                        $('#list_jobs').append('<div class=\"job\" class=\"col-md-12\" data-id=\"' + id + '\"><h4><a class=\"result_job\" href=\"#\" class=\"edit_button\">( no. ' + entry_no + ' ) ' + title + '<\/a><\/h4><\/div>');
+                        entry_no++;
+                    }
+                }
+                view_job_click();
+            }
+        });
+    }
+
     $('#send_request').click(function () {
         var user_input = $('#search_input').val();
 
@@ -161,7 +189,23 @@ $(document).ready(function () {
             data: JSON.stringify(user_input, null, '\t'),
             contentType: 'application/json;charset=UTF-8',
             success: function (result) {
-                $('#loader').replaceWith(result);
+                $('#loader').replaceWith('<div class=\"job_class left_text\" id=\"job_window\"><div class=\"job_inner_class\"><h2>Results:</h2><div class=\"job_list\" id=\"list_jobs\"><\/div><\/div><\/div>');
+
+                var entry_no = 1;
+                var index;
+
+                result = result.split('~');
+
+                for (index = 0; index < result.length; ++index) {
+                    if (result[index].length > 0) {
+                        var splits = result[index].split('#');
+                        var id = splits[0];
+                        var title = splits[1];
+                        $('#list_jobs').append('<div class=\"job\" class=\"col-md-12\" data-id=\"' + id + '\"><h4><a class=\"result_job\" href=\"#\" class=\"edit_button\">( no. ' + entry_no + ' ) ' + title + '<\/a><\/h4><\/div>');
+                        entry_no++;
+                    }
+                }
+                view_job_click();
             }
         });
     });
@@ -244,13 +288,43 @@ $(document).ready(function () {
         window.location.href = '/';
     });
 
-    $('#messanger_dropdown').click(function () {
-
+    $('#history_dropdown').click(function () {
+        window.location.href = 'history';
     });
 
     $('#add_job_button').click(function () {
         window.location.href = 'addjob';
     });
-
-
 });
+
+function view_job_click() {
+    $('.result_job').click(function () {
+        var id = $(this).closest('div').data('id');
+
+        window.open('viewjob?id=' + id);
+    });
+}
+
+function edit_job_edit_delete_click() {
+    $('.edit_button').click(function () {
+        var id = $(this).closest('div').data('id');
+
+        window.location.href = 'editjob?id=' + id;
+    });
+
+    $('.delete_button').click(function () {
+        var id = $(this).closest('div').data('id');
+
+        $.ajax({
+            type: "POST",
+            url: "/deletejob",
+            data: JSON.stringify(id, null, '\t'),
+            contentType: 'application/json;charset=UTF-8',
+            success: function (result) {
+                if (result == 'ok') {
+                    location.reload();
+                }
+            }
+        });
+    });
+}

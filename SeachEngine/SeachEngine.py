@@ -1,7 +1,7 @@
 from flask import Flask, render_template, request
 from ChordNode import ChordNode
 from Job import Job
-from Helper.pxfilter import XssHtml
+from Helper import Helper
 
 chordNode = ChordNode('127.0.0.1')
 anonymousFlag = False
@@ -17,6 +17,19 @@ def route_main_page():
 @app.route('/jobs')
 def route_jobs_page():
     return render_template('jobs.html')
+
+
+@app.route('/history')
+def route_history_page():
+    return render_template('history.html')
+
+
+@app.route('/viewjob')
+def route_view_job_page():
+    global chordNode
+    id = request.args.get('id')
+    chordNode.add_job_history(int(id))
+    return render_template('viewjob.html')
 
 
 @app.route('/addjob')
@@ -46,31 +59,31 @@ def delete_job():
     global chordNode
     id = request.get_json()
 
-    chordNode.delete_job (int(id))
+    chordNode.delete_job(int(id))
     return 'ok'
 
 
 @app.route('/getnodes', methods=['GET'])
 def get_nodes():
-    # global chordNode
-    # return chordNode.get_connected_nodes()
-    return 'ok'
+    global chordNode
+    return chordNode.get_connected_nodes()
+
 
 @app.route('/search', methods=['POST'])
 def search():
     global chordNode
     search_string = request.get_json()
 
-    value = ''
+    result = ''
 
     if anonymousFlag == True:
-        value = chordNode.anonymous_get(search_string)
+        result = chordNode.anonymous_get(search_string)
     elif anonymousFlag == False:
-        value = chordNode.get(search_string)
+        result = chordNode.get(search_string)
     else:
-        value = 'There has been an error'
+        result = 'There has been an error'
 
-    return value
+    return result
 
 
 @app.route('/addnewjob', methods=['POST'])
@@ -82,69 +95,37 @@ def add_new_job():
     keywords = search_string['keywords']
     description = search_string['description']
 
-    '''
-    Prevent XSS attack
-    '''
-    parser = XssHtml()
-    parser.feed(title)
-    parser.close()
-    title = parser.getHtml()
+    title = search_string['title']
+    keywords = search_string['keywords']
+    description = search_string['description']
 
-    parser = XssHtml()
-    parser.feed(keywords)
-    parser.close()
-    keywords = parser.getHtml()
+    xss_list = Helper.xss_parse([title, keywords, description])
 
-    parser = XssHtml()
-    parser.feed(description)
-    parser.close()
-    description = parser.getHtml()
-
-    newJob = Job(title)
-    newJob.add_description(description)
-    newJob.add_keyword(keywords)
+    newJob = Job(xss_list[0])
+    newJob.add_description(xss_list[2])
+    newJob.add_keyword(xss_list[1])
     newJob.add_poster_ip(chordNode.get_ip())
 
     chordNode.add_new_job(newJob)
     return 'ok'
+
 
 @app.route('/submiteditjob', methods=['POST'])
 def submit_edit_job():
     global chordNode
     search_string = request.get_json()
 
-    id=search_string['id']
+    id = search_string['id']
     title = search_string['title']
     keywords = search_string['keywords']
     description = search_string['description']
 
-    '''
-    Prevent XSS attack
-    '''
-    parser = XssHtml()
-    parser.feed(id)
-    parser.close()
-    id = parser.getHtml()
+    xss_list = Helper.xss_parse([id, title, keywords, description])
 
-    parser = XssHtml()
-    parser.feed(title)
-    parser.close()
-    title = parser.getHtml()
-
-    parser = XssHtml()
-    parser.feed(keywords)
-    parser.close()
-    keywords = parser.getHtml()
-
-    parser = XssHtml()
-    parser.feed(description)
-    parser.close()
-    description = parser.getHtml()
-
-    newJob = Job(title)
-    newJob.add_id(int(id))
-    newJob.add_description(description)
-    newJob.add_keyword(keywords)
+    newJob = Job(xss_list[1])
+    newJob.add_id(int(xss_list[0]))
+    newJob.add_description(xss_list[3])
+    newJob.add_keyword(xss_list[2])
     newJob.add_poster_ip(chordNode.get_ip())
 
     chordNode.delete_job(int(id))
@@ -155,11 +136,8 @@ def submit_edit_job():
 @app.route('/getjobs', methods=['GET'])
 def get_all_jobs():
     global chordNode
-    job_titles = ''
-    for iterator in chordNode.get_all_my_jobs():
-        job_titles = job_titles + str(iterator.get_id()) + '#' + iterator.get_title() + '~'
 
-    return job_titles
+    return Helper.serialize_job_title_list(chordNode.get_all_my_jobs())
 
 
 @app.route('/getJobById', methods=['POST'])
@@ -168,16 +146,13 @@ def get_job_by_id():
 
     id = request.get_json()
 
-    selected_job = chordNode.get_job(int(id))
+    return Helper.serialize_job_list([chordNode.get_job(int(id))])
 
-    keyword_string=''
+@app.route('/getHistory', methods=['GET'])
+def get_history():
+    global chordNode
 
-    for iterator in selected_job.get_keywords():
-        keyword_string=keyword_string+str(iterator)+','
-
-    job_titles =str(selected_job.get_id()) + '#' + selected_job.get_title() + '#'+keyword_string+'#'+selected_job.get_description()
-
-    return job_titles
+    return Helper.serialize_job_title_list(chordNode.get_history())
 
 if __name__ == '__main__':
     app.run(host='192.168.0.111', port=5000)

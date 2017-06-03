@@ -125,19 +125,7 @@ body {
     }
 }
 
-.glyphicon-user:before {
-    margin-right: 5px;
-}
-
-.glyphicon-info-sign:before {
-    margin-right: 5px;
-}
-
-.glyphicon-envelope:before {
-    margin-right: 5px;
-}
-
-.glyphicon-home:before {
+.glyphicon-user:before,.glyphicon-header:before,.glyphicon-info-sign:before,.glyphicon-envelope:before,.glyphicon-home:before {
     margin-right: 5px;
 }
 
@@ -178,4 +166,7 @@ body {
     margin-bottom: 2%;
     border: dotted 1px;
 
+}
+.left_text{
+    text-align: left;
 }
