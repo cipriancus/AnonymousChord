@@ -1,11 +1,3 @@
-/*
- *  http_operations.h
- *  iPhone_p2p_engine
- *
- *  Created by Laurent Vanni & Nicolas Goles Domic, 2010
- *
- */
-
 #ifndef HTTP_OPERATIONS_H
 #define HTTP_OPERATIONS_H
 
@@ -36,13 +28,6 @@
  * char *hname		= "www.mydomain.com";
  * char *page		= "/somedir/script.php";
  * char *poststr	= "mode=login&user=test&password=test\r\n";
- *
- */
-
-char* process_http(int sockfd, char *host, char *page, char *poststr);
-
-/*
- *	This function should send a POST to the specified server.
  *
  */
 

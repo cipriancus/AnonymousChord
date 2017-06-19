@@ -1,10 +1,3 @@
-/* 
- * File:   CertificationAuthority.h
- * Author: ciprian
- *
- * Created on February 25, 2017, 4:42 AM
- */
-
 #ifndef CERTIFICATIONAUTHORITY_H
 #define CERTIFICATIONAUTHORITY_H
 

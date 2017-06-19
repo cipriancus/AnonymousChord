@@ -1,11 +1,3 @@
-/*
- *  ProtocolSingleton.h
- *  P2P_Engine
- *
- *  Created by Laurent Vanni & Nicolas Goles Domic, 2010
- *
- */
-
 #define P_SINGLETON ProtocolSingleton::getInstance()
 
 #ifndef PROTOCOL_SINGLETON_H

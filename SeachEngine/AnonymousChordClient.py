@@ -42,9 +42,9 @@ class AnonymousChordClient():
     def get(self, key):
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         s.connect((self.server_ip, self.server_port))
-        data = pack('!%ds' % 100, 'get')
+        data = pack('!%ds' % 100, b'get')
         s.send(bytes(data))
-        data = pack('!%ds' % 1100, str(key))
+        data = pack('!%ds' % 1100, bytes(key,encoding='UTF-8'))
         s.send(bytes(data))
         response = s.recv(5100)
         response = str(response)
@@ -54,17 +54,17 @@ class AnonymousChordClient():
     def put(self, key, value):
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         s.connect((self.server_ip, self.server_port))
-        data = pack('!%ds' % 100, 'put')
+        data = pack('!%ds' % 100, b'put')
         s.send(bytes(data))
-        data = pack('!%ds' % 1100, str(key))
+        data = pack('!%ds' % 1100, bytes(key,encoding='UTF-8'))
         s.send(bytes(data))
-        data = pack('!%ds' % 5100, str(value))
+        data = pack('!%ds' % 5100, value)
         s.send(bytes(data))
 
     def get_connected_nodes(self):
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         s.connect((self.server_ip, self.server_port))
-        s.send(bytes('getallnodes'))
+        s.send(bytes(b'getallnodes'))
         no_of_ch = s.recv(8)
         no_of_ch = int(Helper.get_only_characters(no_of_ch))
         all_nodes = s.recv(no_of_ch)
@@ -74,9 +74,9 @@ class AnonymousChordClient():
     def delete(self, key):
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         s.connect((self.server_ip, self.server_port))
-        data = pack('!%ds' % 100, 'remove')
+        data = pack('!%ds' % 100, b'remove')
         s.send(bytes(data))
-        data = pack('!%ds' % 1100, str(key))
+        data = pack('!%ds' % 1100, bytes(key,encoding='UTF-8'))
         s.send(bytes(data))
         s.close()
 
@@ -84,7 +84,7 @@ class AnonymousChordClient():
         return ''
 
     def exit(self):
-        self.s.send(bytes('exit'))
+        self.s.send(bytes(b'exit'))
 
 
 class CppServerThread(Thread):

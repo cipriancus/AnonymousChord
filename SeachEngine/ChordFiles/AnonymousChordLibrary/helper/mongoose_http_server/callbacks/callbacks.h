@@ -1,15 +1,5 @@
-/*
- *  callbacks.h
- *  iPhone_POC_P2P
- *
- *  Created by Laurent Vanni & Nicolas Goles Domic, 2010
-
- *
- */
-
 #ifndef CALLBACKS_H
 #define CALLBACKS_H
-
 #include "AbstractChord.h"
 #include "chord_callbacks.h"
 #include "http_operations.h"
@@ -24,7 +14,7 @@ void assignNodeReference(AbstractChord *a);
 /*
  *	Tracker request handler. This function should handle the tracker response,
  *	this is because the tracker will respond with a POST, which is NOT how the 
- *  peers communicate. (at least for now)
+ *      peers communicate. (at least for now)
  */
 void call_tracker_handler(struct mg_connection *conn,
 		const struct mg_request_info *request_info, void *user_data);

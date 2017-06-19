@@ -38,11 +38,22 @@ void handle_sigchld(int sig) {
 void child(int client, char * const argv[]);
 
 int main(int argc, char * const argv[]) {
-
     // This application receives args, "ip", "port", "overlay identifier (unique string)", "root directory)"
-    chord = P_SINGLETON->initChordNode(std::string(argv[1]), atoi(argv[2]), std::string("AnonymousChord"), std::string("//"));
-    node = new Node(std::string(argv[3]), 8000);
+    chord = P_SINGLETON->initChordNode(std::string(argv[1]), atoi(argv[2]), std::string("AnonymousChord"), std::string("/home/ciprian/Desktop/SearchEngine"));
+    node = new Node(std::string(argv[3]), 443);
     chord->join(node);
+
+//    Query *query = new Query(2);
+//    query->setOwnerIP(chord->getThisNode()->getIp());
+//
+//    chord->addHandledQuery(query);
+//
+//    string last_node_key;
+//    string last_node_iv;
+//
+//    chord->getNodeKey(chord->getThisNode(), query, last_node_key, last_node_iv);
+//    string crypt = chord->crypt("ana", reinterpret_cast<unsigned char*> ((char*) last_node_key.c_str()), reinterpret_cast<unsigned char*> ((char*) last_node_iv.c_str()));
+//    string plain = chord->decrypt(crypt, reinterpret_cast<unsigned char*> ((char*) last_node_key.c_str()), reinterpret_cast<unsigned char*> ((char*) last_node_iv.c_str()));
 
     struct sockaddr_in server; // structura folosita de server
     struct sockaddr_in from;
@@ -201,15 +212,15 @@ void child(int client, char * const argv[]) {
                 if (value.find((*it)->getIp()) == string::npos)
                     value = value + " " + (*it)->getIp();
             }
-            
+
             char buff[100];
-            string length=string(chord->itoa(value.length(),buff,10));
-            
-            if (write(client, length.c_str(), 8 ) <= 0) {
+            string length = string(chord->itoa(value.length(), buff, 10));
+
+            if (write(client, length.c_str(), 8) <= 0) {
                 perror("[server]Eroare la write() catre client.\n");
                 return;
             }
-            
+
             if (write(client, value.c_str(), value.length()) <= 0) {
                 perror("[server]Eroare la write() catre client.\n");
                 return;

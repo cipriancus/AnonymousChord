@@ -41,7 +41,6 @@ OBJECTFILES= \
 	${OBJECTDIR}/helper/crypto/tomcrypt/algorithms/crypt_argchk.o \
 	${OBJECTDIR}/helper/crypto/tomcrypt/algorithms/md5.o \
 	${OBJECTDIR}/helper/crypto/tomcrypt/algorithms/sha1.o \
-	${OBJECTDIR}/helper/mongoose_http_server/MongooseDaemon.o \
 	${OBJECTDIR}/helper/mongoose_http_server/callbacks/callbacks.o \
 	${OBJECTDIR}/helper/mongoose_http_server/callbacks/chord_callbacks.o \
 	${OBJECTDIR}/helper/mongoose_http_server/mongoose.o \
@@ -112,11 +111,6 @@ ${OBJECTDIR}/helper/crypto/tomcrypt/algorithms/sha1.o: helper/crypto/tomcrypt/al
 	${MKDIR} -p ${OBJECTDIR}/helper/crypto/tomcrypt/algorithms
 	${RM} "$@.d"
 	$(COMPILE.c) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/helper/crypto/tomcrypt/algorithms/sha1.o helper/crypto/tomcrypt/algorithms/sha1.c
-
-${OBJECTDIR}/helper/mongoose_http_server/MongooseDaemon.o: helper/mongoose_http_server/MongooseDaemon.mm
-	${MKDIR} -p ${OBJECTDIR}/helper/mongoose_http_server
-	${RM} "$@.d"
-	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/helper/mongoose_http_server/MongooseDaemon.o helper/mongoose_http_server/MongooseDaemon.mm
 
 ${OBJECTDIR}/helper/mongoose_http_server/callbacks/callbacks.o: helper/mongoose_http_server/callbacks/callbacks.cpp
 	${MKDIR} -p ${OBJECTDIR}/helper/mongoose_http_server/callbacks

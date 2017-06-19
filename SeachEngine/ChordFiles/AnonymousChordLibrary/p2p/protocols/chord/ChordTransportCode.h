@@ -1,11 +1,3 @@
-/*
- *  ChordTransportCode.h
- *  iPhone_p2p_engine
- *
- *  Created by Laurent Vanni & Nicolas Goles Domic, 2010
- *
- */
-
 #ifndef CHORD_TRANSPORT_CODE_H
 #define CHORD_TRANSPORT_CODE_H
 
@@ -27,7 +19,8 @@ typedef enum {
         GETNNEWNODE,//get a new node for a random walk 14
         GETONLINETIME,//15
         RANDOMWALKGETKEY,//16
-        CLOSESTNODETOKEY//17 get closest node to a key
+        CLOSESTNODETOKEY,//17 get closest node to a key
+        GETQUERYKEY//18 get a query key from a node
 } transportCode;
 
 #endif

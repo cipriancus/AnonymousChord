@@ -62,12 +62,12 @@ ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/anonymouschordusecase: ../AnonymousCh
 
 ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/anonymouschordusecase: ${OBJECTFILES}
 	${MKDIR} -p ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}
-	${LINK.cc} -o ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/anonymouschordusecase ${OBJECTFILES} ${LDLIBSOPTIONS} -lpthread -lrt -ldl -lboost_serialization
+	${LINK.cc} -o ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/anonymouschordusecase ${OBJECTFILES} ${LDLIBSOPTIONS} -lpthread -lrt -ldl -lboost_serialization -lboost_system -lboost_filesystem -lboost_thread -ltomcrypt -DLTM_DESC -lcrypto -lcrypt -fno-rtti -lboost_program_options -lboost_thread -lboost_system -lssl -lcrypto -lcurl
 
 ${OBJECTDIR}/main.o: main.cpp
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
-	$(COMPILE.cc) -g -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/main.o main.cpp
+	$(COMPILE.cc) -g -I../../../boost_1_64_0/libs -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/main.o main.cpp
 
 # Subprojects
 .build-subprojects:

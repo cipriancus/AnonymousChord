@@ -170,3 +170,7 @@ body {
 .left_text{
     text-align: left;
 }
+
+.job{
+    border:1px dotted #000;
+}

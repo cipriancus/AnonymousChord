@@ -1,12 +1,4 @@
 /*
- *  IOverlay.h
- *  iPhone_p2p_engine
- *
- *  Created by Laurent Vanni & Nicolas Goles Domic, 2010
- *
- */
-
-/*
  *	Abstract Class IOverlay inherits from the ITransport Class... trying to simulate
  *	an interface.
  */

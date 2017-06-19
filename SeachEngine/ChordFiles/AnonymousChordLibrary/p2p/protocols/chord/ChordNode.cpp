@@ -1,11 +1,3 @@
-/*
- *  ChordNode.cpp
- *  iPhone_p2p_engine
- *
- *  Created by Laurent Vanni & Nicolas Goles Domic, 2010
- *
- */
-
 #include "ChordNode.h"
 #include "Stabilization.h"
 #include "CheckPred.h"
@@ -20,109 +12,109 @@
 #include <dirent.h>
 #include <assert.h>
 #include <math.h>
+#include "boost/filesystem.hpp"
 
-static const std::string PERSISTENCE_DIR = ".chord/data";
+static const std::string PERSISTENCE_DIR = ".chord/data/";
 static const std::string PERSISTENCE_DIR_STRING = ".chord/data/%s";
 
-ChordNode::ChordNode(){
-    
+ChordNode::ChordNode() {
+
 }
 
 /* Constructor */
 ChordNode::ChordNode(const string &ip, int port, const string &overlayIdentifier, const string &rootDirectory) {
-        
-        startTime=time(nullptr);
-    
-	// Define the address space size
-	spacesize = 9;
+    startTime = time(nullptr);
 
-	// Create the id
-	std::ostringstream oss;
-	oss << ip << port;
-	int id = getIntSHA1(oss.str());
+    // Define the address space size
+    spacesize = 9;
 
-	// check if the idE[0, 2^(spacesize - 1)]
-	assert(!(id > pow(2, spacesize)) && !(id < 0));
+    // Create the id
+    std::ostringstream oss;
+    oss << ip << port;
+    int id = getIntSHA1(oss.str());
 
-	//create our stabilizer threads instance.
-	stableThread = new Stabilization(this);
+    // check if the idE[0, 2^(spacesize - 1)]
+    assert(!(id > pow(2, spacesize)) && !(id < 0));
 
-	//Initialize the transport layer.
-	transport = new TransportHTTP(port, rootDirectory);
+    //create our stabilizer threads instance.
+    stableThread = new Stabilization(this);
 
-	//set the overlay identifier.
-	this->overlayIdentifier = overlayIdentifier;
+    //Initialize the transport layer.
+    transport = new TransportHTTP(port, rootDirectory);
 
-	// not yet notified
-	notified = false;
+    //set the overlay identifier.
+    this->overlayIdentifier = overlayIdentifier;
 
-	//Call our parent's initializer
-	initialise(ip, id, port);
+    // not yet notified
+    notified = false;
 
-	//We start-up our stabilizer thread.
-	checkStable();
+    //Call our parent's initializer
+    initialise(ip, id, port);
+
+    //We start-up our stabilizer thread.
+    checkStable();
 }
 
 /* Destructor */
 ChordNode::~ChordNode() {
-	stableThread->kill();
-	delete stableThread;
-	delete transport;
+    stableThread->kill();
+    delete stableThread;
+    delete transport;
 }
 
 /* Override from AbstractChord */
 void ChordNode::notify(Node *n) {
-	Node *pred = predecessor;
-	((AbstractChord *) this)->notify(n);
-	// If the predecessor as changed, update the DHT table
-	if (pred != predecessor) {
-		notified = true;
-	}
+    Node *pred = predecessor;
+    ((AbstractChord *) this)->notify(n);
+    // If the predecessor as changed, update the DHT table
+    if (pred != predecessor) {
+        notified = true;
+    }
 }
 
 /* Custom chord stabilize */
 void ChordNode::stabilize() {
-	((AbstractChord *) this)->stabilize();
-	// If the predecessor as changed, update the DHT table
-	if (notified && predecessor->getId() != thisNode->getId()) {
-		struct dirent *dirEntry;
-		char path[256];
-		DIR *dir = opendir(PERSISTENCE_DIR.c_str());
-		if(dir != NULL){
-			while(dirEntry=readdir(dir)) {
-				if(dirEntry->d_type != DT_DIR){
-					int hFilename = getIntSHA1(dirEntry->d_name);
-					if (!insideRange(hFilename, predecessor->getId(), thisNode->getId())){
-						Request *request = new Request(this->getIdentifier(), PUT);
-						request->addArg("key", dirEntry->d_name);
-						request->addArg("value", openData(dirEntry->d_name));
-						sendRequest(request, predecessor);
-						sprintf(path, PERSISTENCE_DIR_STRING.c_str(), dirEntry->d_name);
-						if( remove( path ) != 0 ) {
-							perror( "Error deleting file" );
-						}
-					}
-				}
-			}
-		}
-		notified = false;
-	}
+    ((AbstractChord *) this)->stabilize();
+    // If the predecessor as changed, update the DHT table
+    if (notified && predecessor->getId() != thisNode->getId()) {
+        struct dirent *dirEntry;
+        char path[256];
+        DIR *dir = opendir(PERSISTENCE_DIR.c_str());
+        if (dir != NULL) {
+            while (dirEntry = readdir(dir)) {
+                if (dirEntry->d_type != DT_DIR) {
+                    int hFilename = getIntSHA1(dirEntry->d_name);
+                    if (!insideRange(hFilename, predecessor->getId(), thisNode->getId())) {
+                        Request *request = new Request(this->getIdentifier(), PUT);
+                        request->addArg("key", dirEntry->d_name);
+                        request->addArg("value", openData(dirEntry->d_name));
+                        sendRequest(request, predecessor);
+                        sprintf(path, PERSISTENCE_DIR_STRING.c_str(), dirEntry->d_name);
+                        if (remove(path) != 0) {
+                            perror("Error deleting file");
+                        }
+                    }
+                }
+            }
+        }
+        notified = false;
+    }
 }
 
 /* find and replace string tools */
 string find_and_replace(string str, const string find, string replace) {
-	size_t j;
-	string source = str;
-	for (; (j = source.find(find)) != string::npos;) {
-		source.replace(j, find.length(), replace);
-	}
-	return source;
+    size_t j;
+    string source = str;
+    for (; (j = source.find(find)) != string::npos;) {
+        source.replace(j, find.length(), replace);
+    }
+    return source;
 }
 
-Query* ChordNode::searchForQueryByHash(string hash){
+Query* ChordNode::searchForQueryByHash(string hash) {
     vector<Query*>::iterator it;
-    for(it=allQueries.begin();it!=allQueries.end();it++){
-        if((*it)->getQueryHash().compare(hash)==0){
+    for (it = allQueries.begin(); it != allQueries.end(); it++) {
+        if ((*it)->getQueryHash().compare(hash) == 0) {
             return (*it);
         }
     }
@@ -131,59 +123,84 @@ Query* ChordNode::searchForQueryByHash(string hash){
 
 /* serialize a postit before to store it into the DHT */
 string ChordNode::serializeData(string data) {
-	data = find_and_replace(data, " ", "\\_");
-	data = find_and_replace(data, "\t", "\\t");
-	data = find_and_replace(data, "\n", "\\n");
-	return data;
+    data = find_and_replace(data, " ", "\\_");
+    data = find_and_replace(data, "\t", "\\t");
+    data = find_and_replace(data, "\n", "\\n");
+    return data;
 }
 
 /* reconstruct a serialized postit */
 string ChordNode::unserializeData(string data) {
-	data = find_and_replace(data, "\\_", " ");
-	data = find_and_replace(data, "\\t", "\t");
-	data = find_and_replace(data, "\\n", "\n");
-	return data;
+    data = find_and_replace(data, "\\_", " ");
+    data = find_and_replace(data, "\\t", "\t");
+    data = find_and_replace(data, "\\n", "\n");
+    return data;
 }
 
 /* save the data value in a text file */
-void ChordNode::saveData(string filename, string value){
-	char path[256];
-	sprintf(path, PERSISTENCE_DIR_STRING.c_str(), filename.c_str());
-	mkdir(".chord/", 0777);
-	mkdir(".chord/data", 0777);
-	ofstream data(path, ios::out);
-	data << unserializeData(value);
+void ChordNode::saveData(string filename, string value) {
+    char path[256];
+    sprintf(path, PERSISTENCE_DIR_STRING.c_str(), filename.c_str());
+    mkdir(".chord/", 0777);
+    mkdir(".chord/data", 0777);
+    ofstream data(path, ios::out);
+    data << unserializeData(value);
+}
+
+/**
+ * Get filename that matches the search token
+ */
+string getFile(string search_token) {
+
+    string filename;
+
+    namespace fs = boost::filesystem;
+
+    fs::path apk_path(PERSISTENCE_DIR);
+    fs::recursive_directory_iterator end;
+
+    for (fs::recursive_directory_iterator i(apk_path); i != end; ++i) {
+        const fs::path cp = (*i);
+        filename = cp.stem().string();
+
+        if (filename.find(search_token) != string::npos) {
+            return filename;
+        }
+    }
+    return search_token;
 }
 
 /* return the content of the file */
-string ChordNode::openData(string filename){
-	string line, data="";
-	char path[256];
-	sprintf(path, PERSISTENCE_DIR_STRING.c_str(), filename.c_str());
-	ifstream myfile(path);
-	if (myfile.is_open()) {
-		while (! myfile.eof()) {
-			getline(myfile,line);
-			data.append(line.c_str());
-			if(! myfile.eof()){
-				data.append("\n");
-			}
-		}
-		myfile.close();
-	}
-	else return "null";
-	return data;
+string ChordNode::openData(string search) {
+    string line, data = "";
+
+    string filename = getFile(search);
+
+    char path[256];
+    sprintf(path, PERSISTENCE_DIR_STRING.c_str(), filename.c_str());
+    ifstream myfile(path);
+    if (myfile.is_open()) {
+        while (!myfile.eof()) {
+            getline(myfile, line);
+            data.append(line.c_str());
+            if (!myfile.eof()) {
+                data.append("\n");
+            }
+        }
+        myfile.close();
+    } else return "null";
+    return data;
 }
 
 string ChordNode::serialize(ChordNode* node) {
     std::ostringstream ofs;
-    boost::archive::text_oarchive oa(ofs);   
+    boost::archive::text_oarchive oa(ofs);
     ofs.flush();
-    oa<<node;
+    oa << node;
     return ofs.str();
 }
 
-ChordNode* ChordNode::deserialize(string data){
+ChordNode* ChordNode::deserialize(string data) {
     ChordNode *tempNode;
     std::istringstream ifs(data);
     boost::archive::text_iarchive ia(ifs);
@@ -191,188 +208,195 @@ ChordNode* ChordNode::deserialize(string data){
     return tempNode;
 }
 
-
 /* DHT Put */
 void ChordNode::put(string key, string value) {
-	// Convert the key in a hash integer
-	int hKey = getIntSHA1(key);
-	if (insideRange(hKey, predecessor->getId() + 1, thisNode->getId())) {
-		// I'm responsible for this key
-		//		table[key] = value;
-		saveData(key, value);
-	} else {
-		// Find the node responsible for this key
-		Node *responsible = findSuccessor(hKey);
-		// Create a Put request.
-		Request *request = new Request(this->getIdentifier(), PUT);
-		request->addArg("key", key);
-		request->addArg("value", value);
-		// Send the Put request
-		sendRequest(request, responsible);
-	}
+    // Convert the key in a hash integer
+    int hKey = getIntSHA1(key);
+    if (insideRange(hKey, predecessor->getId() + 1, thisNode->getId())) {
+        // I'm responsible for this key
+        //		table[key] = value;
+        saveData(key, value);
+    } else {
+        // Find the node responsible for this key
+        Node *responsible = findSuccessor(hKey);
+        // Create a Put request.
+        Request *request = new Request(this->getIdentifier(), PUT);
+        request->addArg("key", key);
+        request->addArg("value", value);
+        // Send the Put request
+        sendRequest(request, responsible);
+    }
 }
 
 /* DHT Get */
 string ChordNode::get(string key) {
-	// Convert the key in a hash integer
-	int hKey = getIntSHA1(key);
-	if (insideRange(hKey, predecessor->getId() + 1, thisNode->getId())) {
-		// I'm responsible for this key
-		return openData(key);
-	} else {
-		// Find the node responsible for this key
-		Node *responsible = findSuccessor(hKey);
-		// Create a Put request.
-		Request *request = new Request(this->getIdentifier(), GET);
-		request->addArg("key", key);
-		// Send the Put request
-		return sendRequest(request, responsible);
-	}
+    // Convert the key in a hash integer
+    int hKey = getIntSHA1(key);
+    if (insideRange(hKey, predecessor->getId() + 1, thisNode->getId())) {
+        // I'm responsible for this key
+        return openData(key);
+    } else {
+        // Find the node responsible for this key
+        Node *responsible = findSuccessor(hKey);
+        // Create a Put request.
+        Request *request = new Request(this->getIdentifier(), GET);
+        request->addArg("key", key);
+        // Send the Put request
+        return sendRequest(request, responsible);
+    }
 }
 
 /* DHT Remove */
 void ChordNode::removekey(string key) {
-	// Convert the key in a hash integer
-	int hKey = getIntSHA1(key);
-	if (insideRange(hKey, predecessor->getId() + 1, thisNode->getId())) {
-		// I'm responsible for this key
-		char path[256];
-		sprintf(path, PERSISTENCE_DIR_STRING.c_str(), key.c_str());
-		if( remove( path ) != 0 ) {
-			perror( "Error deleting file" );
-		}
-	} else {
-		// Find the node responsible for this key
-		Node *responsible = findSuccessor(hKey);
-		// Create a Put request.
-		Request *request = new Request(this->getIdentifier(), REMOVEKEY);
-		request->addArg("key", key);
-		// Send the Put request
-		sendRequest(request, responsible);
-	}
+    // Convert the key in a hash integer
+    int hKey = getIntSHA1(key);
+    if (insideRange(hKey, predecessor->getId() + 1, thisNode->getId())) {
+        // I'm responsible for this key
+        char path[256];
+        sprintf(path, PERSISTENCE_DIR_STRING.c_str(), key.c_str());
+        if (remove(path) != 0) {
+            perror("Error deleting file");
+        }
+    } else {
+        // Find the node responsible for this key
+        Node *responsible = findSuccessor(hKey);
+        // Create a Put request.
+        Request *request = new Request(this->getIdentifier(), REMOVEKEY);
+        request->addArg("key", key);
+        // Send the Put request
+        sendRequest(request, responsible);
+    }
 }
 
 string ChordNode::getDataOrPrecedingNode(char *id) {
-   
+
     int hKey = getIntSHA1(string(id));
 
     if (insideRange(hKey, predecessor->getId() + 1, thisNode->getId())) {
         // I'm responsible for this key
-	return openData(string(id));
+        return openData(string(id));
     }
     Node *node = closestPrecedingNode(hKey);
-    
+
     return node->serializeNode();
 }
 
-
 /* Convert a string into an integer in [0, spacesize] */
 unsigned int ChordNode::getIntSHA1(string str) {
-	SHA1 *sha1 = new SHA1();
-	sha1->addBytes( str.c_str(), strlen( str.c_str() ));
-	unsigned char* digest = sha1->getDigest();
-	unsigned int res = sha1->shaToInteger(digest, 20, pow(2, spacesize));
-	delete sha1;
-	free( digest );
-	return res;
+    SHA1 *sha1 = new SHA1();
+    sha1->addBytes(str.c_str(), strlen(str.c_str()));
+    unsigned char* digest = sha1->getDigest();
+    unsigned int res = sha1->shaToInteger(digest, 20, pow(2, spacesize));
+    delete sha1;
+    free(digest);
+    return res;
 }
 
 /* Convert a string into a string (using SHA1) */
 char *ChordNode::getHexSHA1(string str) {
-	SHA1 *sha1 = new SHA1();
-	sha1->addBytes( str.c_str(), strlen( str.c_str() ));
-	unsigned char *digest = sha1->getDigest();
-	char *h = sha1->hexPrinter(digest, 20);
-	delete sha1;
-	free( digest );
-	return h;
+    SHA1 *sha1 = new SHA1();
+    sha1->addBytes(str.c_str(), strlen(str.c_str()));
+    unsigned char *digest = sha1->getDigest();
+    char *h = sha1->hexPrinter(digest, 20);
+    delete sha1;
+    free(digest);
+    return h;
 }
 
 /* Forward a message to a peer, the message is in the format: "<IP+PORT>,TRANSPORT_CODE" */
 string ChordNode::sendRequest(Request *request, Node* destination) {
-	char *response = transport->sendRequest(request, destination);
-	// response received
-	if (response) {
-		stringstream ss;
-		ss << response;
-		free(response); // we must free the initial char* response, to avoid leaks.
-		return ss.str();
-	} else {
-		// Fix the broken pointers of the node
-		fixBrokenPointers(destination);
-		// time to fix the chord
-		sleep(1);
-		// The node is completely disconnected of the backbone
-		if (isAlone()) { // there is only one response possible
-			return getThisNode()->toString();
-		}
-		// try again the request with a new destination
-		return sendRequest(request, findSuccessor(destination->getId()));
-	}
+    char *response = transport->sendRequest(request, destination);
+    // response received
+    if (response) {
+        stringstream ss;
+        ss << response;
+        //free(response); // we must free the initial char* response, to avoid leaks.
+        return ss.str();
+    } else {
+        // Fix the broken pointers of the node
+        fixBrokenPointers(destination);
+        // time to fix the chord
+        sleep(1);
+        // The node is completely disconnected of the backbone
+        if (isAlone()) { // there is only one response possible
+            return getThisNode()->toString();
+        }
+        // try again the request with a new destination
+        return sendRequest(request, findSuccessor(destination->getId()));
+    }
 }
 
 /* Fix broken pointers algorithm */
 void ChordNode::fixBrokenPointers(Node *node) {
-	for (int i = 0; i < fingerTable.size() - 1; i++) {
-		if (fingerTable[i]->getId() == node->getId()) {
-			fingerTable[i] = new Node(thisNode->toString());
-		} 
-	}
-	if (predecessor->getId() == node->getId()) {
-		predecessor = new Node(thisNode->toString());
-	} 
-	if (successor->getId() == node->getId()) {
-		successor = new Node(thisNode->toString());
-	}
+    for (int i = 0; i < fingerTable.size() - 1; i++) {
+        if (fingerTable[i]->getId() == node->getId()) {
+            fingerTable[i] = new Node(thisNode->toString());
+        }
+    }
+    if (predecessor->getId() == node->getId()) {
+        predecessor = new Node(thisNode->toString());
+    }
+    if (successor->getId() == node->getId()) {
+        successor = new Node(thisNode->toString());
+    }
 }
 
 /* return true if the node is completely disconnected of the chord */
-bool ChordNode::isAlone(){
-	for (int i = 0; i < fingerTable.size() - 1; i++) {
-		if (fingerTable[i]->getId() != thisNode->getId()){
-			return false;
-		}
-	}
-	return predecessor->getId() == thisNode->getId() && successor->getId() == thisNode->getId();
+bool ChordNode::isAlone() {
+    for (int i = 0; i < fingerTable.size() - 1; i++) {
+        if (fingerTable[i]->getId() != thisNode->getId()) {
+            return false;
+        }
+    }
+    return predecessor->getId() == thisNode->getId() && successor->getId() == thisNode->getId();
 }
 
 /* Starts up the "stabilizer thread" for this peer. */
 void ChordNode::checkStable() {
-	stableThread->start();
+    stableThread->start();
 }
 
 bool ChordNode::getQueryForHash(string hash, Query *query) {
     vector<Query*>::iterator it;
-    for(it=allQueries.begin();it!=allQueries.end();it++){
-        if((*it)->getQueryHash().compare(hash)==0)
+    for (it = allQueries.begin(); it != allQueries.end(); it++) {
+        if ((*it)->getQueryHash().compare(hash) == 0)
             break;
-    }    
-    if(it==allQueries.end()){
+    }
+    if (it == allQueries.end()) {
         return false;
-    }else{
-        query=(*it);
+    } else {
+        query = (*it);
         return true;
     }
 }
 
+Query* ChordNode::getHandledQueryForHash(string hash) {
+    vector<Query*>::iterator it;
+    for (it = handledQueries.begin(); it != handledQueries.end(); it++) {
+        if ((*it)->getQueryHash().compare(hash) == 0) {
+            return handledQueries[it - handledQueries.begin()];
+        }
+    }
+    return NULL;
+}
+
 Node* ChordNode::getNodeForIP(string ip) {
-    if(thisNode->getIp().compare(ip)==0)
+    if (thisNode->getIp().compare(ip) == 0)
         return thisNode;
-    
+
     vector<Node*>::iterator it;
-    for(it=fingerTable.begin();it!=fingerTable.end();it++){
-        if((*it)->getIp().compare(ip)==0)
+    for (it = fingerTable.begin(); it != fingerTable.end(); it++) {
+        if ((*it)->getIp().compare(ip) == 0)
             return (*it);
     }
     return NULL;
 }
 
-
 vector<Node*> ChordNode::getPassedQueryForHash(string hash) {
-    map<string,vector<Node*>>::iterator it;
+    map<string, vector < Node*>>::iterator it;
     vector<Node*> returnVec;
-    for(it=passedQueries.begin();it!=passedQueries.end();it++){
-        if((*it).first.compare(hash)==0){
+    for (it = passedQueries.begin(); it != passedQueries.end(); it++) {
+        if ((*it).first.compare(hash) == 0) {
             return (*it).second;
         }
     }
@@ -380,243 +404,338 @@ vector<Node*> ChordNode::getPassedQueryForHash(string hash) {
 }
 
 void ChordNode::addPassedQuery(string hash, vector<Node*> predSucc) {
-    passedQueries[hash]=predSucc;
+    passedQueries[hash] = predSucc;
 }
 
 /* Stop the stabilization, distribute the key and shutDown the peer */
 void ChordNode::shutDown() {
-	// kill the stabilization Threads
-	stableThread->kill();
+    // kill the stabilization Threads
+    stableThread->kill();
 
-	// notify predecessor
-	Request *request = new Request(this->getIdentifier(), SETSUCC);
-	request->addArg("successor", successor->toString());
-	sendRequest(request, predecessor);
+    // notify predecessor
+    Request *request = new Request(this->getIdentifier(), SETSUCC);
+    request->addArg("successor", successor->toString());
+    sendRequest(request, predecessor);
 
-	// notify successor
-	request = new Request(this->getIdentifier(), SETPRED);
-	request->addArg("predecessor", predecessor->toString());
-	sendRequest(request, successor);
+    // notify successor
+    request = new Request(this->getIdentifier(), SETPRED);
+    request->addArg("predecessor", predecessor->toString());
+    sendRequest(request, successor);
 
-	// if the node is not alone
-	if(successor->getId() != getThisNode()->getId()){
-		// give the part of the DHT to the successor
-		struct dirent *dirEntry;
-		DIR *dir = opendir(PERSISTENCE_DIR.c_str());
-		char path[256];
-		while(dirEntry=readdir(dir)) {
-			if(dirEntry->d_type != DT_DIR){
-				request = new Request(this->getIdentifier(), PUT);
-				request->addArg("key", dirEntry->d_name);
-				request->addArg("value", openData(dirEntry->d_name));
-				sendRequest(request, successor);
-				sprintf(path, PERSISTENCE_DIR_STRING.c_str(), dirEntry->d_name);
-				if( remove( path ) != 0 ) {
-					perror( "Error deleting file" );
-				}
-			}
-		}
-	}
+    // if the node is not alone
+    if (successor->getId() != getThisNode()->getId()) {
+        // give the part of the DHT to the successor
+        struct dirent *dirEntry;
+        DIR *dir = opendir(PERSISTENCE_DIR.c_str());
+        char path[256];
+        while (dirEntry = readdir(dir)) {
+            if (dirEntry->d_type != DT_DIR) {
+                request = new Request(this->getIdentifier(), PUT);
+                request->addArg("key", dirEntry->d_name);
+                request->addArg("value", openData(dirEntry->d_name));
+                sendRequest(request, successor);
+                sprintf(path, PERSISTENCE_DIR_STRING.c_str(), dirEntry->d_name);
+                if (remove(path) != 0) {
+                    perror("Error deleting file");
+                }
+            }
+        }
+    }
 
-	// leave
-	cout << "bye bye...\n";
-	sleep(1);
-	exit(0);
+    // leave
+    cout << "bye bye...\n";
+    sleep(1);
+    exit(0);
 }
 
-
 /* A utility function to reverse a string  */
-void ChordNode::reverse(char str[], int length)
-{
+void ChordNode::reverse(char str[], int length) {
     int start = 0;
-    int end = length -1;
-    while (start < end)
-    {
-        swap(*(str+start), *(str+end));
+    int end = length - 1;
+    while (start < end) {
+        swap(*(str + start), *(str + end));
         start++;
         end--;
     }
 }
- 
+
 // Implementation of itoa()
-char* ChordNode::itoa(int num, char* str, int base)
-{
+
+char* ChordNode::itoa(int num, char* str, int base) {
     int i = 0;
     bool isNegative = false;
- 
+
     /* Handle 0 explicitely, otherwise empty string is printed for 0 */
-    if (num == 0)
-    {
+    if (num == 0) {
         str[i++] = '0';
         str[i] = '\0';
         return str;
     }
- 
+
     // In standard itoa(), negative numbers are handled only with 
     // base 10. Otherwise numbers are considered unsigned.
-    if (num < 0 && base == 10)
-    {
+    if (num < 0 && base == 10) {
         isNegative = true;
         num = -num;
     }
- 
+
     // Process individual digits
-    while (num != 0)
-    {
+    while (num != 0) {
         int rem = num % base;
-        str[i++] = (rem > 9)? (rem-10) + 'a' : rem + '0';
-        num = num/base;
+        str[i++] = (rem > 9) ? (rem - 10) + 'a' : rem + '0';
+        num = num / base;
     }
- 
+
     // If number is negative, append '-'
     if (isNegative)
         str[i++] = '-';
- 
+
     str[i] = '\0'; // Append string terminator
- 
+
     // Reverse the string
     reverse(str, i);
- 
+
     return str;
 }
- 
+#include <openssl/x509.h>
+#include <openssl/pem.h>
 
-void *contact_node(void *args){
-      int oldtype;
+void *contact_node(void *args) {
+    int oldtype;
 
-    contact *contactNodes=(contact*)args;
-        
-    ChordNode *node=contactNodes->node;
-    Node *selectedNode=contactNodes->selectedNode;
-    map<string,string> queryParams=contactNodes->queryParams;
+    contact *contactNodes = (contact*) args;
+
+    ChordNode *node = contactNodes->node;
+    Node *selectedNode = contactNodes->selectedNode;
+    map<string, string> queryParams = contactNodes->queryParams;
 
     /* allow the thread to be killed at any time */
-     pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS, &oldtype);
-        
+    pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS, &oldtype);
+
     Request *request = new Request(node->getIdentifier(), contactNodes->tr);
-    
-        if(queryParams.size()>0){
-            map<string,string>::iterator it;
-            for(it=queryParams.begin();it!=queryParams.end();it++){
-                  request->addArg((*it).first,(*it).second);
-            }
+
+    if (queryParams.size() > 0) {
+        map<string, string>::iterator it;
+        for (it = queryParams.begin(); it != queryParams.end(); it++) {
+            request->addArg((*it).first, (*it).second);
         }
-    
-    string response=node->sendRequest(request, selectedNode);//the serialized finger table from the contacted node
-   
+    }
+
+    string response = node->sendRequest(request, selectedNode); //the serialized finger table from the contacted node
+
     pthread_cond_signal(&node->done);
-   
-    char *responseCh=(char*)malloc(response.size()*sizeof(char));
-    strcpy(responseCh,response.c_str());
-    return (void*)responseCh;
+
+    char *responseCh = (char*) malloc(response.size() * sizeof (char));
+    strcpy(responseCh, response.c_str());
+    return (void*) responseCh;
 }
 
-string ChordNode::send_request_with_timeout(Node *selectedNode,transportCode tr,int noOfSecondsToWait,map<string,string> &queryParams){
-       struct timespec max_wait;
-       memset(&max_wait, 0, sizeof(max_wait));        
-       max_wait.tv_sec = noOfSecondsToWait;    
-    
-       struct timespec abs_time;
-       pthread_t tid;
-       int err;
-        
-       pthread_mutex_lock(&calculating);
+string ChordNode::send_request_with_timeout(Node *selectedNode, transportCode tr, int noOfSecondsToWait, map<string, string> &queryParams) {
+    struct timespec max_wait;
+    memset(&max_wait, 0, sizeof (max_wait));
+    max_wait.tv_sec = noOfSecondsToWait;
 
-        /* pthread cond_timedwait expects an absolute time to wait until */
-        clock_gettime(CLOCK_REALTIME, &abs_time);
-        abs_time.tv_sec += max_wait.tv_sec;
-        abs_time.tv_nsec += max_wait.tv_nsec;
-        
-        sleep(random(0,2));//wait a no of sec for attack prevention
-             
-        contact contactNodes;
-        contactNodes.node=this;
-        contactNodes.selectedNode=selectedNode;
-        contactNodes.tr=tr;
-        contactNodes.queryParams=queryParams;
-        
-        pthread_create(&tid, NULL, contact_node,(void*)&contactNodes);
+    struct timespec abs_time;
+    pthread_t tid;
+    int err;
 
-        err = pthread_cond_timedwait(&done, &calculating, &abs_time);
-       
-        char * temp;
+    pthread_mutex_lock(&calculating);
 
-        if (!err){
-            pthread_mutex_unlock(&calculating);
-            pthread_join(tid, (void**)&temp);
-            return string(temp);
-        }
-        pthread_cancel(tid);
+    /* pthread cond_timedwait expects an absolute time to wait until */
+    clock_gettime(CLOCK_REALTIME, &abs_time);
+    abs_time.tv_sec += max_wait.tv_sec;
+    abs_time.tv_nsec += max_wait.tv_nsec;
+
+    sleep(random(0, 2)); //wait a no of sec for attack prevention
+
+    contact contactNodes;
+    contactNodes.node = this;
+    contactNodes.selectedNode = selectedNode;
+    contactNodes.tr = tr;
+    contactNodes.queryParams = queryParams;
+
+    pthread_create(&tid, NULL, contact_node, (void*) &contactNodes);
+
+    err = pthread_cond_timedwait(&done, &calculating, &abs_time);
+
+    char * temp;
+
+    if (!err) {
         pthread_mutex_unlock(&calculating);
-        return string("failed");
+        pthread_join(tid, (void**) &temp);
+        return string(temp);
+    }
+    pthread_cancel(tid);
+    pthread_mutex_unlock(&calculating);
+    return string("failed");
 }
 
-
-/*
- * Insert dummy query
- * 
- */
-string ChordNode::randomWalk(string key){   
+string ChordNode::randomWalk(string key) {
     int hKey = getIntSHA1(key);
     if (insideRange(hKey, predecessor->getId() + 1, thisNode->getId())) {
-	// I'm responsible for this key
-	return openData(key);
+        // I'm responsible for this key
+        return openData(key);
     }
-    
-    Query *query=new Query(2,2);
+
+    Query *query = new Query(2, 2);
     allQueries.push_back(query);
-    query->addFingerTable(fingerTable,thisNode);
+    query->addFingerTable(fingerTable, thisNode);
 
     phaseOne(query);
-    
-    
-    Node* A=query->getSelectedNodes().front();//get first selected nod of first part of random walk
-    query->popFrontSelectedNodes();
-    
-    ChordNode *tempNode=new ChordNode();
-    tempNode->setFingerTable(query->getSelectedNodes());//Crypt nodes in getSelectedNodes with all the node keys
-    
-    map<string,string> queryParams;
-    queryParams["table"]=tempNode->serialize(tempNode);
-    queryParams["hash"]=query->getQueryHash();
-    char buffer[100];
-    int l=query->getL();
-    queryParams["l"]=string(itoa(l,buffer,10));
-    queryParams["id"]=key;//SHOULD BE CRIPTED WITH LAST NODE KEY
-    queryParams["enumeration_command"]=string(P_SINGLETON->getChordNode()->itoa(16,buffer,10));//16=RANDOMWALKGETKEY
-    queryParams["last_node"]=query->getSelectedNodes().back()->serializeNode();//What node to contact at end of random walk
-    //queryParams["public_key"] for last node to crypt the selected nodes
 
-    string response = send_request_with_timeout(A,RANDOMWALKCONTACT,400,queryParams);//inside response are NODES or fail
+    Node* A = query->getSelectedNodes().front(); //get first selected nod of first part of random walk
+    query->popFrontSelectedNodes();
+
+    ChordNode *tempNode = new ChordNode();
+    tempNode->setFingerTable(query->getSelectedNodes()); //Crypt nodes in getSelectedNodes with all the node keys
+
+    string last_node_key_str;
+    string last_node_iv_str;
     
+    getNodeKey(query->getSelectedNodes().back(), query, last_node_key_str, last_node_iv_str);
+
+    unsigned char* last_node_key = reinterpret_cast<unsigned char*>((char*)last_node_key_str.c_str());
+    unsigned char* last_node_iv = reinterpret_cast<unsigned char*>((char*)last_node_iv_str.c_str());
+
+    string second_last_node_key_str;
+    string second_last_node_iv_str;
+    
+    getNodeKey(query->getSelectedNodes().back(), query, second_last_node_key_str, second_last_node_key_str);
+
+    unsigned char* second_last_node_key = reinterpret_cast<unsigned char*>((char*)second_last_node_key_str.c_str());
+    unsigned char* second_last_node_iv = reinterpret_cast<unsigned char*>((char*)second_last_node_iv_str.c_str());
+
+    map<string, string> queryParams;
+    queryParams["table"] = tempNode->serialize(tempNode);
+
+    queryParams["hash"] = query->getQueryHash();
+
+    char buffer[100];
+    int l = query->getL();
+
+    queryParams["l"] = crypt(string(itoa(l, buffer, 10)), last_node_key, last_node_iv);
+
+    queryParams["id"] = crypt(key, last_node_key, last_node_iv);
+
+    queryParams["enumeration_command"] = crypt(string(P_SINGLETON->getChordNode()->itoa(16, buffer, 10)), second_last_node_key, second_last_node_iv); //16=RANDOMWALKGETKEY
+
+    queryParams["last_node"] = crypt(query->getSelectedNodes().back()->serializeNode(), second_last_node_key, second_last_node_iv); //What node to contact at end of random walk
+
+    string response = decrypt(send_request_with_timeout(A, RANDOMWALKCONTACT, 400, queryParams), last_node_key, last_node_iv); //inside response are NODES or fail
+
     return response;
 }
 
-void ChordNode::phaseOne(Query *query){
-     //Faze one
-    for(int iterator=0;iterator<query->getL();iterator){
-        vector<Node *> currentTable=query->getLastFingerTableEntry();
-        
+void ChordNode::phaseOne(Query *query) {
+    //Faze one
+    for (int iterator = 0; iterator < query->getL(); iterator) {
+        vector<Node *> currentTable = query->getLastFingerTableEntry();
+
         string serializedTable;
-        
+
         Node *selectedNode;
-                
-        do{
-            int randomNode=random(0,fingerTable.size()-1);//select a random node from current finger table
-        
-            selectedNode=currentTable[randomNode];//select the node
-            
+
+        do {
+            int randomNode = random(0, fingerTable.size() - 1); //select a random node from current finger table
+
+            selectedNode = currentTable[randomNode]; //select the node
+
             //check if it wasn't selected before
-            if(query->hasBeenSelected(selectedNode)==false){
-                map<string,string> queryParams;      
-                serializedTable = send_request_with_timeout(selectedNode,GETFINGERTABLE,4,queryParams);
+            if (query->hasBeenSelected(selectedNode) == false) {
+                map<string, string> queryParams;
+                serializedTable = send_request_with_timeout(selectedNode, GETFINGERTABLE, 4, queryParams);
             }
-        }while(serializedTable.size()==0||serializedTable.compare(string("failed"))==0);
-        
+        } while (serializedTable.size() == 0 || serializedTable.compare(string("failed")) == 0);
+
         //if duplicate
-        if(query->addFingerTable(deserialize(serializedTable)->getFingerTable(),selectedNode)==true){
+        if (query->addFingerTable(deserialize(serializedTable)->getFingerTable(), selectedNode) == true) {
             query->addSelectedNodes(selectedNode);
             iterator++;
-        }   
+        }
     }//at the end in selectedNodes we will have the chain of nodes
+}
+
+void ChordNode::getNodeKey(Node *node, Query *query, string &in_key, string &in_iv) {
+
+    Request *request = new Request(getIdentifier(), GETQUERYKEY);
+    request->addArg("query_hash", query->getQueryHash());
+
+    char buffer[100];
+    request->addArg("l", itoa(query->getL(), buffer, 10));
+
+    string response = sendRequest(request, node);
+
+
+    in_key = response.substr(0, 16);
+    in_iv = response.substr(17, response.npos);
+}
+
+string ChordNode::crypt(string plaintext_string, unsigned char *key, unsigned char *iv) {
+    EVP_CIPHER_CTX *ctx = EVP_CIPHER_CTX_new();
+
+    char *plaintext = (char*) plaintext_string.c_str();
+    int plaintext_len = plaintext_string.size();
+    int result_0f_encrypt = 0;
+
+    result_0f_encrypt = EVP_EncryptInit_ex(ctx, EVP_aes_128_cbc(), NULL, key, iv);
+
+    if (1 == result_0f_encrypt) {
+        char ciphertext[plaintext_len];
+        int len = 0;
+        int ciphertext_len;
+
+        if (1 != EVP_EncryptUpdate(ctx, (unsigned char*) ciphertext, &len, (unsigned char*) plaintext, plaintext_len))
+            return NULL;
+
+        ciphertext_len = len;
+
+        if (1 != EVP_EncryptFinal_ex(ctx, (unsigned char*) ciphertext + len, &len))
+            return NULL;
+
+        ciphertext_len += len;
+        EVP_CIPHER_CTX_free(ctx);
+
+        int iterator;
+        string cypher;
+        for (iterator = 0; iterator < ciphertext_len; iterator++)
+            cypher.push_back(ciphertext[iterator]);
+
+        return cypher;
+    }
+    return NULL;
+}
+
+string ChordNode::decrypt(string cryptotext_string, unsigned char *key, unsigned char *iv) {
+    EVP_CIPHER_CTX *ctx = EVP_CIPHER_CTX_new();
+
+    char *cryptotext = (char*) cryptotext_string.c_str();
+    int crypto_len = cryptotext_string.size();
+    int result_0f_decrypt = 0;
+
+    result_0f_decrypt = EVP_DecryptInit_ex(ctx, EVP_aes_128_cbc(), NULL, key, iv);
+
+    if (1 == result_0f_decrypt) {
+        char plaintext[crypto_len];
+        int len = 0;
+        int plaintext_len;
+
+        if (1 != EVP_DecryptUpdate(ctx, (unsigned char*) plaintext, &len, (unsigned char*) cryptotext, crypto_len))
+            return NULL;
+
+        plaintext_len = len;
+
+        if (1 != EVP_DecryptFinal_ex(ctx, (unsigned char*) plaintext + len, &len))
+            return NULL;
+
+        plaintext_len += len;
+        EVP_CIPHER_CTX_free(ctx);
+
+        int iterator;
+        string plaintext_str;
+        for (iterator = 0; iterator < plaintext_len; iterator++)
+            plaintext_str.push_back(plaintext[iterator]);
+
+        return plaintext_str;
+    }
+    return NULL;
 }

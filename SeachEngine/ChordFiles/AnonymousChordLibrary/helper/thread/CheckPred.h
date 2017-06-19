@@ -1,13 +1,4 @@
 /*
- *  CheckPred.h
- *  iPhone_p2p_engine
- *
- *  Created by Laurent Vanni & Nicolas Goles Domic, 2010
-
- *
- */
-
-/*
  *	Inherits from "Thread" (POSIX compilant thread implementation)
  *	the run method is what actually runs the checkStable().
  *	_NG

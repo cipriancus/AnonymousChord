@@ -1,10 +1,3 @@
-/* 
- * File:   HELPER.h
- * Author: ciprian
- *
- * Created on March 27, 2017, 11:41 PM
- */
-
 #ifndef HELPER_H
 #define HELPER_H
 
@@ -29,6 +22,8 @@ public:
     static long int deserializeLongInt(string data);
     static string     serializeLongInt(long int x);
     static transportCode getEnumForInt(int no);
+    static void reverse(char str[], int length);
+    static char* itoa(int num, char* str, int base);
 
 };
 

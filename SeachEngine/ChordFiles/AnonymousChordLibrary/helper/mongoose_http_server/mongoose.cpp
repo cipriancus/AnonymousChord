@@ -177,8 +177,8 @@ typedef struct DIR {
 #include <dirent.h>
 #include <dlfcn.h>
 #include <pthread.h>
-#define	SSL_LIB			"libssl.so"
-#define	CRYPTO_LIB		"libcrypto.so"
+#define	SSL_LIB			"libssl.so.1.0.0"
+#define	CRYPTO_LIB		"libcrypto.so.1.0.0"
 #define	DIRSEP			'/'
 #define	IS_DIRSEP_CHAR(c)	((c) == '/')
 #define	O_BINARY		0
@@ -4022,7 +4022,7 @@ load_dll(struct mg_context *ctx, const char *dll_name, struct ssl_func *sw)
 static bool_t
 set_ssl_option(struct mg_context *ctx, const char *pem)
 {
-	SSL_CTX		*CTX;
+    	SSL_CTX		*CTX;
 	int		i, size, retval = FALSE;
 
 	if (load_dll(ctx, SSL_LIB, ssl_sw) == FALSE ||

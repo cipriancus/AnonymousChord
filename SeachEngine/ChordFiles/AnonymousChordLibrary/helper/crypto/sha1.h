@@ -10,8 +10,7 @@ accompanying LICENSE file.
 
 #ifndef SHA1_HEADER
 typedef unsigned int Uint32;
-
-class SHA1
+    class SHA1
 {
 	private:
 		// fields

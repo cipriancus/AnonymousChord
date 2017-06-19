@@ -1,7 +1,12 @@
+from asyncio.test_utils import dummy_ssl_context
+
 from flask import Flask, render_template, request
 from ChordNode import ChordNode
 from Job import Job
 from Helper import Helper
+import os
+
+os.chdir('../../Desktop/SeachEngine/')
 
 chordNode = ChordNode('127.0.0.1')
 anonymousFlag = False
@@ -65,8 +70,9 @@ def delete_job():
 
 @app.route('/getnodes', methods=['GET'])
 def get_nodes():
-    global chordNode
-    return chordNode.get_connected_nodes()
+    # global chordNode
+    # return chordNode.get_connected_nodes()
+    return 'ok'
 
 
 @app.route('/search', methods=['POST'])
@@ -107,6 +113,7 @@ def add_new_job():
     newJob.add_poster_ip(chordNode.get_ip())
 
     chordNode.add_new_job(newJob)
+
     return 'ok'
 
 
@@ -154,5 +161,9 @@ def get_history():
 
     return Helper.serialize_job_title_list(chordNode.get_history())
 
+import ssl
+context=ssl.SSLContext(ssl.PROTOCOL_TLSv1_2)
+context.load_cert_chain('certificate.crt', 'private.key')
+
 if __name__ == '__main__':
-    app.run(host='192.168.0.111', port=5000)
+    app.run(host='192.168.0.111', port=5000, ssl_context=context)

@@ -1,14 +1,4 @@
-/*
- *  callbacks.c
- *  iPhone_POC_P2P
- *
- *  Created by Laurent Vanni & Nicolas Goles Domic, 2010
-
- *
- */
-
 #include "callbacks.h"
-
 #include <assert.h>
 #include <stdlib.h>
 #include <arpa/inet.h>
@@ -19,14 +9,9 @@
 #include "ChordTransportCode.h"
 #include "ProtocolSingleton.h"
 
-/*
- *	Tracker request handler. This function should handle the tracker response,
- *	this is because the tracker will respond with a POST, which is NOT how the 
- *  peers communicate. (at least for now)
- */
+
 void call_tracker_handler(struct mg_connection *conn,
 		const struct mg_request_info *request_info, void *user_data) {
-	//HERE I MUST EXTRACT THE POST MESSAGE OF THE TRACKER! (maybe we will need to handle that in base64).
 }
 
 /*
@@ -38,12 +23,12 @@ void call_tracker_handler(struct mg_connection *conn,
  */
 void call_request_handler(struct mg_connection *conn,
 		const struct mg_request_info *request_info, void *user_data) {
-	char* auxMessage = (char *) malloc(sizeof(strlen(request_info->post_data)));
+	char* auxMessage = (char *) malloc(sizeof(strlen((char*)user_data)));
 	int message = -1;
 	string result;
 
 	if (auxMessage != NULL) {
-		strcpy(auxMessage, request_info->post_data);
+		strcpy(auxMessage,(char*) user_data);
 		message = getPostMessage(auxMessage);
 		free(auxMessage);
 	}
@@ -87,11 +72,6 @@ void call_request_handler(struct mg_connection *conn,
 	mg_printf(conn, "%s", result.c_str());
 }
 
-/*
- *	This functions are mostly for experimental purposes. It should support to send POST 
- *  back, to a peer who sent POST first ( PING - PONG ), with the same message, similar
- *  to "echo".
- */
 void call_ping(struct mg_connection *conn,
 		const struct mg_request_info *request_info, void *user_data) {
 	mg_printf(conn, "%s", "HTTP/1.1 200 OK\r\n");
@@ -104,7 +84,7 @@ void call_ping(struct mg_connection *conn,
 	printf("Been PING...sending PONG...\n");
 
 	sendPost((char *) returnIP(conn), 8080, (char *) "/pong",
-			request_info->post_data);
+			(char*)user_data);
 }
 
 void call_pong(struct mg_connection *conn,
@@ -115,7 +95,7 @@ void call_pong(struct mg_connection *conn,
 	mg_printf(conn, "%s", "<p>\"PONG\" sent from ");
 	mg_printf(conn, "%s", returnIP(conn));
 	mg_printf(conn, "%s", "<br>");
-	mg_printf(conn, "%s %s", "Message: ", request_info->post_data);
+	mg_printf(conn, "%s %s", "Message: ", user_data);
 	mg_printf(conn, "%s", "</body></html>");
 
 	printf("...PONG...\n");
@@ -124,10 +104,6 @@ void call_pong(struct mg_connection *conn,
 			(char *) "PONG!!!");
 }
 
-/*
- * One of the first test cases, just a simple callback to display the requester's IP
- * on a webpage.
- */
 void show_secret(struct mg_connection *conn,
 		const struct mg_request_info *request_info, void *user_data) {
 	mg_printf(conn, "%s", "HTTP/1.1 200 OK\r\n");

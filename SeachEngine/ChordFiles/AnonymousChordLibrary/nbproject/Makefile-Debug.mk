@@ -41,7 +41,6 @@ OBJECTFILES= \
 	${OBJECTDIR}/helper/crypto/tomcrypt/algorithms/crypt_argchk.o \
 	${OBJECTDIR}/helper/crypto/tomcrypt/algorithms/md5.o \
 	${OBJECTDIR}/helper/crypto/tomcrypt/algorithms/sha1.o \
-	${OBJECTDIR}/helper/mongoose_http_server/MongooseDaemon.o \
 	${OBJECTDIR}/helper/mongoose_http_server/callbacks/callbacks.o \
 	${OBJECTDIR}/helper/mongoose_http_server/callbacks/chord_callbacks.o \
 	${OBJECTDIR}/helper/mongoose_http_server/mongoose.o \
@@ -61,8 +60,8 @@ OBJECTFILES= \
 CFLAGS=
 
 # CC Compiler Flags
-CCFLAGS=-lrt -ldl -lpthread -lboost_system -D_XOPEN_SOURCE
-CXXFLAGS=-lrt -ldl -lpthread -lboost_system -D_XOPEN_SOURCE
+CCFLAGS=-D_XOPEN_SOURCE -lpthread -lrt -ldl -lboost_serialization -lboost_system -lboost_filesystem -lboost_thread -ltomcrypt -DLTM_DESC -lboost_program_options -lboost_thread -lssl -lcrypto -ldl -lz
+CXXFLAGS=-D_XOPEN_SOURCE -lpthread -lrt -ldl -lboost_serialization -lboost_system -lboost_filesystem -lboost_thread -ltomcrypt -DLTM_DESC -lboost_program_options -lboost_thread -lssl -lcrypto -ldl -lz
 
 # Fortran Compiler Flags
 FFLAGS=
@@ -86,17 +85,17 @@ ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/libanonymouschordlibrary.a: ${OBJECTF
 ${OBJECTDIR}/helper/HELPER.o: helper/HELPER.cpp
 	${MKDIR} -p ${OBJECTDIR}/helper
 	${RM} "$@.d"
-	$(COMPILE.cc) -g -Ihelper -Ihelper/crypto -Ihelper/mongoose_http_server/callbacks -Ihelper/mongoose_http_server -Ihelper/thread -Ihelper/request -Ip2p/node -Ip2p/protocols -Ip2p/protocols/chord -Ip2p/transport/http -Ip2p/transport -Ip2p/protocols/ca -I../../Downloads/boost_1_63_0/bin.v2 -I../../Downloads/boost_1_63_0/stage -Ibuild/include -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/helper/HELPER.o helper/HELPER.cpp
+	$(COMPILE.cc) -g -Ihelper -Ihelper/crypto -Ihelper/mongoose_http_server/callbacks -Ihelper/mongoose_http_server -Ihelper/thread -Ihelper/request -Ip2p/node -Ip2p/protocols -Ip2p/protocols/chord -Ip2p/transport/http -Ip2p/transport -Ip2p/protocols/ca -Ibuild/include -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/helper/HELPER.o helper/HELPER.cpp
 
 ${OBJECTDIR}/helper/HTTP_Client.o: helper/HTTP_Client.cpp
 	${MKDIR} -p ${OBJECTDIR}/helper
 	${RM} "$@.d"
-	$(COMPILE.cc) -g -Ihelper -Ihelper/crypto -Ihelper/mongoose_http_server/callbacks -Ihelper/mongoose_http_server -Ihelper/thread -Ihelper/request -Ip2p/node -Ip2p/protocols -Ip2p/protocols/chord -Ip2p/transport/http -Ip2p/transport -Ip2p/protocols/ca -I../../Downloads/boost_1_63_0/bin.v2 -I../../Downloads/boost_1_63_0/stage -Ibuild/include -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/helper/HTTP_Client.o helper/HTTP_Client.cpp
+	$(COMPILE.cc) -g -Ihelper -Ihelper/crypto -Ihelper/mongoose_http_server/callbacks -Ihelper/mongoose_http_server -Ihelper/thread -Ihelper/request -Ip2p/node -Ip2p/protocols -Ip2p/protocols/chord -Ip2p/transport/http -Ip2p/transport -Ip2p/protocols/ca -Ibuild/include -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/helper/HTTP_Client.o helper/HTTP_Client.cpp
 
 ${OBJECTDIR}/helper/crypto/sha1.o: helper/crypto/sha1.cpp
 	${MKDIR} -p ${OBJECTDIR}/helper/crypto
 	${RM} "$@.d"
-	$(COMPILE.cc) -g -Ihelper -Ihelper/crypto -Ihelper/mongoose_http_server/callbacks -Ihelper/mongoose_http_server -Ihelper/thread -Ihelper/request -Ip2p/node -Ip2p/protocols -Ip2p/protocols/chord -Ip2p/transport/http -Ip2p/transport -Ip2p/protocols/ca -I../../Downloads/boost_1_63_0/bin.v2 -I../../Downloads/boost_1_63_0/stage -Ibuild/include -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/helper/crypto/sha1.o helper/crypto/sha1.cpp
+	$(COMPILE.cc) -g -Ihelper -Ihelper/crypto -Ihelper/mongoose_http_server/callbacks -Ihelper/mongoose_http_server -Ihelper/thread -Ihelper/request -Ip2p/node -Ip2p/protocols -Ip2p/protocols/chord -Ip2p/transport/http -Ip2p/transport -Ip2p/protocols/ca -Ibuild/include -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/helper/crypto/sha1.o helper/crypto/sha1.cpp
 
 ${OBJECTDIR}/helper/crypto/tomcrypt/algorithms/crypt_argchk.o: helper/crypto/tomcrypt/algorithms/crypt_argchk.c
 	${MKDIR} -p ${OBJECTDIR}/helper/crypto/tomcrypt/algorithms
@@ -113,75 +112,70 @@ ${OBJECTDIR}/helper/crypto/tomcrypt/algorithms/sha1.o: helper/crypto/tomcrypt/al
 	${RM} "$@.d"
 	$(COMPILE.c) -g -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/helper/crypto/tomcrypt/algorithms/sha1.o helper/crypto/tomcrypt/algorithms/sha1.c
 
-${OBJECTDIR}/helper/mongoose_http_server/MongooseDaemon.o: helper/mongoose_http_server/MongooseDaemon.mm
-	${MKDIR} -p ${OBJECTDIR}/helper/mongoose_http_server
-	${RM} "$@.d"
-	$(COMPILE.cc) -g -Ihelper -Ihelper/crypto -Ihelper/mongoose_http_server/callbacks -Ihelper/mongoose_http_server -Ihelper/thread -Ihelper/request -Ip2p/node -Ip2p/protocols -Ip2p/protocols/chord -Ip2p/transport/http -Ip2p/transport -Ip2p/protocols/ca -I../../Downloads/boost_1_63_0/bin.v2 -I../../Downloads/boost_1_63_0/stage -Ibuild/include -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/helper/mongoose_http_server/MongooseDaemon.o helper/mongoose_http_server/MongooseDaemon.mm
-
 ${OBJECTDIR}/helper/mongoose_http_server/callbacks/callbacks.o: helper/mongoose_http_server/callbacks/callbacks.cpp
 	${MKDIR} -p ${OBJECTDIR}/helper/mongoose_http_server/callbacks
 	${RM} "$@.d"
-	$(COMPILE.cc) -g -Ihelper -Ihelper/crypto -Ihelper/mongoose_http_server/callbacks -Ihelper/mongoose_http_server -Ihelper/thread -Ihelper/request -Ip2p/node -Ip2p/protocols -Ip2p/protocols/chord -Ip2p/transport/http -Ip2p/transport -Ip2p/protocols/ca -I../../Downloads/boost_1_63_0/bin.v2 -I../../Downloads/boost_1_63_0/stage -Ibuild/include -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/helper/mongoose_http_server/callbacks/callbacks.o helper/mongoose_http_server/callbacks/callbacks.cpp
+	$(COMPILE.cc) -g -Ihelper -Ihelper/crypto -Ihelper/mongoose_http_server/callbacks -Ihelper/mongoose_http_server -Ihelper/thread -Ihelper/request -Ip2p/node -Ip2p/protocols -Ip2p/protocols/chord -Ip2p/transport/http -Ip2p/transport -Ip2p/protocols/ca -Ibuild/include -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/helper/mongoose_http_server/callbacks/callbacks.o helper/mongoose_http_server/callbacks/callbacks.cpp
 
 ${OBJECTDIR}/helper/mongoose_http_server/callbacks/chord_callbacks.o: helper/mongoose_http_server/callbacks/chord_callbacks.cpp
 	${MKDIR} -p ${OBJECTDIR}/helper/mongoose_http_server/callbacks
 	${RM} "$@.d"
-	$(COMPILE.cc) -g -Ihelper -Ihelper/crypto -Ihelper/mongoose_http_server/callbacks -Ihelper/mongoose_http_server -Ihelper/thread -Ihelper/request -Ip2p/node -Ip2p/protocols -Ip2p/protocols/chord -Ip2p/transport/http -Ip2p/transport -Ip2p/protocols/ca -I../../Downloads/boost_1_63_0/bin.v2 -I../../Downloads/boost_1_63_0/stage -Ibuild/include -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/helper/mongoose_http_server/callbacks/chord_callbacks.o helper/mongoose_http_server/callbacks/chord_callbacks.cpp
+	$(COMPILE.cc) -g -Ihelper -Ihelper/crypto -Ihelper/mongoose_http_server/callbacks -Ihelper/mongoose_http_server -Ihelper/thread -Ihelper/request -Ip2p/node -Ip2p/protocols -Ip2p/protocols/chord -Ip2p/transport/http -Ip2p/transport -Ip2p/protocols/ca -Ibuild/include -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/helper/mongoose_http_server/callbacks/chord_callbacks.o helper/mongoose_http_server/callbacks/chord_callbacks.cpp
 
 ${OBJECTDIR}/helper/mongoose_http_server/mongoose.o: helper/mongoose_http_server/mongoose.cpp
 	${MKDIR} -p ${OBJECTDIR}/helper/mongoose_http_server
 	${RM} "$@.d"
-	$(COMPILE.cc) -g -Ihelper -Ihelper/crypto -Ihelper/mongoose_http_server/callbacks -Ihelper/mongoose_http_server -Ihelper/thread -Ihelper/request -Ip2p/node -Ip2p/protocols -Ip2p/protocols/chord -Ip2p/transport/http -Ip2p/transport -Ip2p/protocols/ca -I../../Downloads/boost_1_63_0/bin.v2 -I../../Downloads/boost_1_63_0/stage -Ibuild/include -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/helper/mongoose_http_server/mongoose.o helper/mongoose_http_server/mongoose.cpp
+	$(COMPILE.cc) -g -Ihelper -Ihelper/crypto -Ihelper/mongoose_http_server/callbacks -Ihelper/mongoose_http_server -Ihelper/thread -Ihelper/request -Ip2p/node -Ip2p/protocols -Ip2p/protocols/chord -Ip2p/transport/http -Ip2p/transport -Ip2p/protocols/ca -Ibuild/include -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/helper/mongoose_http_server/mongoose.o helper/mongoose_http_server/mongoose.cpp
 
 ${OBJECTDIR}/helper/request/Request.o: helper/request/Request.cpp
 	${MKDIR} -p ${OBJECTDIR}/helper/request
 	${RM} "$@.d"
-	$(COMPILE.cc) -g -Ihelper -Ihelper/crypto -Ihelper/mongoose_http_server/callbacks -Ihelper/mongoose_http_server -Ihelper/thread -Ihelper/request -Ip2p/node -Ip2p/protocols -Ip2p/protocols/chord -Ip2p/transport/http -Ip2p/transport -Ip2p/protocols/ca -I../../Downloads/boost_1_63_0/bin.v2 -I../../Downloads/boost_1_63_0/stage -Ibuild/include -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/helper/request/Request.o helper/request/Request.cpp
+	$(COMPILE.cc) -g -Ihelper -Ihelper/crypto -Ihelper/mongoose_http_server/callbacks -Ihelper/mongoose_http_server -Ihelper/thread -Ihelper/request -Ip2p/node -Ip2p/protocols -Ip2p/protocols/chord -Ip2p/transport/http -Ip2p/transport -Ip2p/protocols/ca -Ibuild/include -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/helper/request/Request.o helper/request/Request.cpp
 
 ${OBJECTDIR}/helper/thread/Thread.o: helper/thread/Thread.cpp
 	${MKDIR} -p ${OBJECTDIR}/helper/thread
 	${RM} "$@.d"
-	$(COMPILE.cc) -g -Ihelper -Ihelper/crypto -Ihelper/mongoose_http_server/callbacks -Ihelper/mongoose_http_server -Ihelper/thread -Ihelper/request -Ip2p/node -Ip2p/protocols -Ip2p/protocols/chord -Ip2p/transport/http -Ip2p/transport -Ip2p/protocols/ca -I../../Downloads/boost_1_63_0/bin.v2 -I../../Downloads/boost_1_63_0/stage -Ibuild/include -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/helper/thread/Thread.o helper/thread/Thread.cpp
+	$(COMPILE.cc) -g -Ihelper -Ihelper/crypto -Ihelper/mongoose_http_server/callbacks -Ihelper/mongoose_http_server -Ihelper/thread -Ihelper/request -Ip2p/node -Ip2p/protocols -Ip2p/protocols/chord -Ip2p/transport/http -Ip2p/transport -Ip2p/protocols/ca -Ibuild/include -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/helper/thread/Thread.o helper/thread/Thread.cpp
 
 ${OBJECTDIR}/p2p/node/Node.o: p2p/node/Node.cpp
 	${MKDIR} -p ${OBJECTDIR}/p2p/node
 	${RM} "$@.d"
-	$(COMPILE.cc) -g -Ihelper -Ihelper/crypto -Ihelper/mongoose_http_server/callbacks -Ihelper/mongoose_http_server -Ihelper/thread -Ihelper/request -Ip2p/node -Ip2p/protocols -Ip2p/protocols/chord -Ip2p/transport/http -Ip2p/transport -Ip2p/protocols/ca -I../../Downloads/boost_1_63_0/bin.v2 -I../../Downloads/boost_1_63_0/stage -Ibuild/include -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/p2p/node/Node.o p2p/node/Node.cpp
+	$(COMPILE.cc) -g -Ihelper -Ihelper/crypto -Ihelper/mongoose_http_server/callbacks -Ihelper/mongoose_http_server -Ihelper/thread -Ihelper/request -Ip2p/node -Ip2p/protocols -Ip2p/protocols/chord -Ip2p/transport/http -Ip2p/transport -Ip2p/protocols/ca -Ibuild/include -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/p2p/node/Node.o p2p/node/Node.cpp
 
 ${OBJECTDIR}/p2p/protocols/ProtocolSingleton.o: p2p/protocols/ProtocolSingleton.cpp
 	${MKDIR} -p ${OBJECTDIR}/p2p/protocols
 	${RM} "$@.d"
-	$(COMPILE.cc) -g -Ihelper -Ihelper/crypto -Ihelper/mongoose_http_server/callbacks -Ihelper/mongoose_http_server -Ihelper/thread -Ihelper/request -Ip2p/node -Ip2p/protocols -Ip2p/protocols/chord -Ip2p/transport/http -Ip2p/transport -Ip2p/protocols/ca -I../../Downloads/boost_1_63_0/bin.v2 -I../../Downloads/boost_1_63_0/stage -Ibuild/include -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/p2p/protocols/ProtocolSingleton.o p2p/protocols/ProtocolSingleton.cpp
+	$(COMPILE.cc) -g -Ihelper -Ihelper/crypto -Ihelper/mongoose_http_server/callbacks -Ihelper/mongoose_http_server -Ihelper/thread -Ihelper/request -Ip2p/node -Ip2p/protocols -Ip2p/protocols/chord -Ip2p/transport/http -Ip2p/transport -Ip2p/protocols/ca -Ibuild/include -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/p2p/protocols/ProtocolSingleton.o p2p/protocols/ProtocolSingleton.cpp
 
 ${OBJECTDIR}/p2p/protocols/ca/CertificationAuthority.o: p2p/protocols/ca/CertificationAuthority.cpp
 	${MKDIR} -p ${OBJECTDIR}/p2p/protocols/ca
 	${RM} "$@.d"
-	$(COMPILE.cc) -g -Ihelper -Ihelper/crypto -Ihelper/mongoose_http_server/callbacks -Ihelper/mongoose_http_server -Ihelper/thread -Ihelper/request -Ip2p/node -Ip2p/protocols -Ip2p/protocols/chord -Ip2p/transport/http -Ip2p/transport -Ip2p/protocols/ca -I../../Downloads/boost_1_63_0/bin.v2 -I../../Downloads/boost_1_63_0/stage -Ibuild/include -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/p2p/protocols/ca/CertificationAuthority.o p2p/protocols/ca/CertificationAuthority.cpp
+	$(COMPILE.cc) -g -Ihelper -Ihelper/crypto -Ihelper/mongoose_http_server/callbacks -Ihelper/mongoose_http_server -Ihelper/thread -Ihelper/request -Ip2p/node -Ip2p/protocols -Ip2p/protocols/chord -Ip2p/transport/http -Ip2p/transport -Ip2p/protocols/ca -Ibuild/include -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/p2p/protocols/ca/CertificationAuthority.o p2p/protocols/ca/CertificationAuthority.cpp
 
 ${OBJECTDIR}/p2p/protocols/chord/AbstractChord.o: p2p/protocols/chord/AbstractChord.cpp
 	${MKDIR} -p ${OBJECTDIR}/p2p/protocols/chord
 	${RM} "$@.d"
-	$(COMPILE.cc) -g -Ihelper -Ihelper/crypto -Ihelper/mongoose_http_server/callbacks -Ihelper/mongoose_http_server -Ihelper/thread -Ihelper/request -Ip2p/node -Ip2p/protocols -Ip2p/protocols/chord -Ip2p/transport/http -Ip2p/transport -Ip2p/protocols/ca -I../../Downloads/boost_1_63_0/bin.v2 -I../../Downloads/boost_1_63_0/stage -Ibuild/include -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/p2p/protocols/chord/AbstractChord.o p2p/protocols/chord/AbstractChord.cpp
+	$(COMPILE.cc) -g -Ihelper -Ihelper/crypto -Ihelper/mongoose_http_server/callbacks -Ihelper/mongoose_http_server -Ihelper/thread -Ihelper/request -Ip2p/node -Ip2p/protocols -Ip2p/protocols/chord -Ip2p/transport/http -Ip2p/transport -Ip2p/protocols/ca -Ibuild/include -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/p2p/protocols/chord/AbstractChord.o p2p/protocols/chord/AbstractChord.cpp
 
 ${OBJECTDIR}/p2p/protocols/chord/ChordNode.o: p2p/protocols/chord/ChordNode.cpp
 	${MKDIR} -p ${OBJECTDIR}/p2p/protocols/chord
 	${RM} "$@.d"
-	$(COMPILE.cc) -g -Ihelper -Ihelper/crypto -Ihelper/mongoose_http_server/callbacks -Ihelper/mongoose_http_server -Ihelper/thread -Ihelper/request -Ip2p/node -Ip2p/protocols -Ip2p/protocols/chord -Ip2p/transport/http -Ip2p/transport -Ip2p/protocols/ca -I../../Downloads/boost_1_63_0/bin.v2 -I../../Downloads/boost_1_63_0/stage -Ibuild/include -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/p2p/protocols/chord/ChordNode.o p2p/protocols/chord/ChordNode.cpp
+	$(COMPILE.cc) -g -Ihelper -Ihelper/crypto -Ihelper/mongoose_http_server/callbacks -Ihelper/mongoose_http_server -Ihelper/thread -Ihelper/request -Ip2p/node -Ip2p/protocols -Ip2p/protocols/chord -Ip2p/transport/http -Ip2p/transport -Ip2p/protocols/ca -Ibuild/include -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/p2p/protocols/chord/ChordNode.o p2p/protocols/chord/ChordNode.cpp
 
 ${OBJECTDIR}/p2p/protocols/chord/Query.o: p2p/protocols/chord/Query.cpp
 	${MKDIR} -p ${OBJECTDIR}/p2p/protocols/chord
 	${RM} "$@.d"
-	$(COMPILE.cc) -g -Ihelper -Ihelper/crypto -Ihelper/mongoose_http_server/callbacks -Ihelper/mongoose_http_server -Ihelper/thread -Ihelper/request -Ip2p/node -Ip2p/protocols -Ip2p/protocols/chord -Ip2p/transport/http -Ip2p/transport -Ip2p/protocols/ca -I../../Downloads/boost_1_63_0/bin.v2 -I../../Downloads/boost_1_63_0/stage -Ibuild/include -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/p2p/protocols/chord/Query.o p2p/protocols/chord/Query.cpp
+	$(COMPILE.cc) -g -Ihelper -Ihelper/crypto -Ihelper/mongoose_http_server/callbacks -Ihelper/mongoose_http_server -Ihelper/thread -Ihelper/request -Ip2p/node -Ip2p/protocols -Ip2p/protocols/chord -Ip2p/transport/http -Ip2p/transport -Ip2p/protocols/ca -Ibuild/include -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/p2p/protocols/chord/Query.o p2p/protocols/chord/Query.cpp
 
 ${OBJECTDIR}/p2p/transport/http/TransportHTTP.o: p2p/transport/http/TransportHTTP.cpp
 	${MKDIR} -p ${OBJECTDIR}/p2p/transport/http
 	${RM} "$@.d"
-	$(COMPILE.cc) -g -Ihelper -Ihelper/crypto -Ihelper/mongoose_http_server/callbacks -Ihelper/mongoose_http_server -Ihelper/thread -Ihelper/request -Ip2p/node -Ip2p/protocols -Ip2p/protocols/chord -Ip2p/transport/http -Ip2p/transport -Ip2p/protocols/ca -I../../Downloads/boost_1_63_0/bin.v2 -I../../Downloads/boost_1_63_0/stage -Ibuild/include -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/p2p/transport/http/TransportHTTP.o p2p/transport/http/TransportHTTP.cpp
+	$(COMPILE.cc) -g -Ihelper -Ihelper/crypto -Ihelper/mongoose_http_server/callbacks -Ihelper/mongoose_http_server -Ihelper/thread -Ihelper/request -Ip2p/node -Ip2p/protocols -Ip2p/protocols/chord -Ip2p/transport/http -Ip2p/transport -Ip2p/protocols/ca -Ibuild/include -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/p2p/transport/http/TransportHTTP.o p2p/transport/http/TransportHTTP.cpp
 
 ${OBJECTDIR}/p2p/transport/http/http_operations.o: p2p/transport/http/http_operations.cpp
 	${MKDIR} -p ${OBJECTDIR}/p2p/transport/http
 	${RM} "$@.d"
-	$(COMPILE.cc) -g -Ihelper -Ihelper/crypto -Ihelper/mongoose_http_server/callbacks -Ihelper/mongoose_http_server -Ihelper/thread -Ihelper/request -Ip2p/node -Ip2p/protocols -Ip2p/protocols/chord -Ip2p/transport/http -Ip2p/transport -Ip2p/protocols/ca -I../../Downloads/boost_1_63_0/bin.v2 -I../../Downloads/boost_1_63_0/stage -Ibuild/include -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/p2p/transport/http/http_operations.o p2p/transport/http/http_operations.cpp
+	$(COMPILE.cc) -g -Ihelper -Ihelper/crypto -Ihelper/mongoose_http_server/callbacks -Ihelper/mongoose_http_server -Ihelper/thread -Ihelper/request -Ip2p/node -Ip2p/protocols -Ip2p/protocols/chord -Ip2p/transport/http -Ip2p/transport -Ip2p/protocols/ca -Ibuild/include -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/p2p/transport/http/http_operations.o p2p/transport/http/http_operations.cpp
 
 # Subprojects
 .build-subprojects:

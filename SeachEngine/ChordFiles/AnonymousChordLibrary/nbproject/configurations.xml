@@ -49,8 +49,6 @@
             <itemPath>helper/mongoose_http_server/callbacks/chord_callbacks.cpp</itemPath>
             <itemPath>helper/mongoose_http_server/callbacks/chord_callbacks.h</itemPath>
           </logicalFolder>
-          <itemPath>helper/mongoose_http_server/MongooseDaemon.h</itemPath>
-          <itemPath>helper/mongoose_http_server/MongooseDaemon.mm</itemPath>
           <itemPath>helper/mongoose_http_server/mongoose.cpp</itemPath>
           <itemPath>helper/mongoose_http_server/mongoose.h</itemPath>
         </logicalFolder>
@@ -146,11 +144,9 @@
             <pElem>p2p/transport/http</pElem>
             <pElem>p2p/transport</pElem>
             <pElem>p2p/protocols/ca</pElem>
-            <pElem>../../Downloads/boost_1_63_0/bin.v2</pElem>
-            <pElem>../../Downloads/boost_1_63_0/stage</pElem>
             <pElem>build/include</pElem>
           </incDir>
-          <commandLine>-lrt -ldl -lpthread -lboost_system -D_XOPEN_SOURCE</commandLine>
+          <commandLine>-D_XOPEN_SOURCE -lpthread -lrt -ldl -lboost_serialization -lboost_system -lboost_filesystem -lboost_thread -ltomcrypt -DLTM_DESC -lboost_program_options -lboost_thread -lssl -lcrypto -ldl -lz</commandLine>
         </ccTool>
         <archiverTool>
         </archiverTool>
@@ -250,16 +246,6 @@
       <item path="helper/crypto/tomcrypt/headers/tomcrypt_test.h"
             ex="false"
             tool="3"
-            flavor2="0">
-      </item>
-      <item path="helper/mongoose_http_server/MongooseDaemon.h"
-            ex="false"
-            tool="3"
-            flavor2="0">
-      </item>
-      <item path="helper/mongoose_http_server/MongooseDaemon.mm"
-            ex="false"
-            tool="1"
             flavor2="0">
       </item>
       <item path="helper/mongoose_http_server/callbacks/callbacks.cpp"
@@ -493,16 +479,6 @@
       <item path="helper/crypto/tomcrypt/headers/tomcrypt_test.h"
             ex="false"
             tool="3"
-            flavor2="0">
-      </item>
-      <item path="helper/mongoose_http_server/MongooseDaemon.h"
-            ex="false"
-            tool="3"
-            flavor2="0">
-      </item>
-      <item path="helper/mongoose_http_server/MongooseDaemon.mm"
-            ex="false"
-            tool="1"
             flavor2="0">
       </item>
       <item path="helper/mongoose_http_server/callbacks/callbacks.cpp"

@@ -1,12 +1,4 @@
 /*
- *  ITransport.h
- *  iPhone_p2p_engine
- *
- *  Created by Laurent Vanni & Nicolas Goles Domic, 2010
- *
- */
-
-/*
  * This is an abstract class with pure virtual methods.
  */
 

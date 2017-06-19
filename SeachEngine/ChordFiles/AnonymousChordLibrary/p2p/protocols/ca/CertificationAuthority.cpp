@@ -1,15 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
-/* 
- * File:   CertificationAuthority.cpp
- * Author: ciprian
- * 
- * Created on February 25, 2017, 4:42 AM
- */
 #include"CertificationAuthority.h"
 
 CertificationAuthority::CertificationAuthority(const string &ip, int port,

@@ -194,6 +194,11 @@ $(document).ready(function () {
                 var entry_no = 1;
                 var index;
 
+                if(result == '0'){
+                    $('#list_jobs').append('<div class=\"job col-md-12\"><h4>No results found<\/h4><\/div>');
+                    return;
+                }
+
                 result = result.split('~');
 
                 for (index = 0; index < result.length; ++index) {
@@ -201,7 +206,10 @@ $(document).ready(function () {
                         var splits = result[index].split('#');
                         var id = splits[0];
                         var title = splits[1];
-                        $('#list_jobs').append('<div class=\"job\" class=\"col-md-12\" data-id=\"' + id + '\"><h4><a class=\"result_job\" href=\"#\" class=\"edit_button\">( no. ' + entry_no + ' ) ' + title + '<\/a><\/h4><\/div>');
+                        var keywords = splits[2];
+                        var description = splits[3];
+
+                        $('#list_jobs').append('<div class=\"job col-md-12\" data-id=\"' + id + '\"><h4><a class=\"result_job col-md-8\" href=\"#\">( no. ' + entry_no + ' ) ' + title + '<\/a><a class=\"col-md-4\" style="text-decoration: none;">'+keywords+'<\/a><\/h4><\/div>');
                         entry_no++;
                     }
                 }

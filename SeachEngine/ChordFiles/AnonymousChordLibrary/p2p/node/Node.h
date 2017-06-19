@@ -1,11 +1,3 @@
-/*
- *  Node.h
- *  iPhone_p2p_engine
- *
- *  Created by Laurent Vanni & Nicolas Goles Domic, 2010
- *
- */
-
 #ifndef NODE_H
 #define NODE_H
 
@@ -19,56 +11,91 @@
 #include <boost/serialization/vector.hpp>
 #include <boost/serialization/string.hpp>
 #include <boost/serialization/assume_abstract.hpp>
+#include <openssl/bio.h>
 
 using namespace std;
 
-class Node
-{
-
+class Node {
 public:
-        Node();
-	Node(const string &inIp, unsigned int inId, unsigned int inPort);
-	Node(const string &ip, unsigned int port);
-	Node(const string &data);
-        Node(const string &inIp, unsigned int inId, unsigned int inPort,string inSignature);
-        ~Node();
-        
-	bool	equals(Node *node);
-	string	toString();
-	vector<string> tokenize(const string& str, const string& delims);
+    Node();
+    Node(const string &inIp, unsigned int inId, unsigned int inPort);
+    Node(const string &ip, unsigned int port);
+    Node(const string &data);
+    ~Node();
 
-	//Getters & Setters
-	unsigned int 	getId() { return nid; }
-	void			setId(unsigned  int inId) { nid = inId; }
-	string			getIdString(){ return nidS; }
-	void			setIdString(const string &s) { nidS = string(s); }
-	string			getIp(){ return ip; }
-	void			setIp(const std::string inIp) { ip = inIp; }
-	unsigned int	getNid() { return nid; }
-	void			setNid(unsigned int n) { nid = n; }
-	int				getPort() { return port; }
-	void			setPort(int inPort){ port = inPort; }
-        string                  getSignature() {return signature;}
-        void                    setSignature(string signature){this->signature=signature;}
-        
-        friend class boost::serialization::access;
+    bool equals(Node *node);
+    string toString();
+    vector<string> tokenize(const string& str, const string& delims);
+    void setKey();
 
-        template<class Archive>
-            void serialize(Archive &ar,unsigned int version){
+    //Getters & Setters
+
+    unsigned int getId() {
+        return nid;
+    }
+
+    void setId(unsigned int inId) {
+        nid = inId;
+    }
+
+    string getIdString() {
+        return nidS;
+    }
+
+    void setIdString(const string &s) {
+        nidS = string(s);
+    }
+
+    string getIp() {
+        return ip;
+    }
+
+    void setIp(const std::string inIp) {
+        ip = inIp;
+    }
+
+    unsigned int getNid() {
+        return nid;
+    }
+
+    void setNid(unsigned int n) {
+        nid = n;
+    }
+
+    int getPort() {
+        return port;
+    }
+
+    void setPort(int inPort) {
+        port = inPort;
+    }
+
+    string getSignature() {
+        return signature;
+    }
+
+    void setSignature(string signature) {
+        this->signature = signature;
+    }
+
+    friend class boost::serialization::access;
+
+    template<class Archive>
+    void serialize(Archive &ar, unsigned int version) {
         // save/load base class information
-            ar & signature & ip &nid&nidS&port;
-        }
-        
-        string serializeNode();
-        Node*  deserializeNode(string serializedNode);
+        ar & signature & ip & nid & nidS&port;
+    }
+
+    string serializeNode();
+    Node* deserializeNode(string serializedNode);
 
 private:
-        string signature;
-	string			ip;
-	unsigned int	nid; //node id (nid), "id" is reserved keyword in Cocoa.
-	string			nidS;
-	int				port;
+#define P_SINGLETON ProtocolSingleton::getInstance()
 
+    string signature;
+    string ip;
+    unsigned int nid; //node id (nid), "id" is reserved keyword in Cocoa.
+    string nidS;
+    int port;
 };
-
 #endif

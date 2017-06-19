@@ -1,14 +1,3 @@
-/*
- *  ChordNode.h
- *  iPhone_p2p_engine
- *
- *  Created by Laurent Vanni & Nicolas Goles Domic, 2010
- *
- *	This class is the implementation of the "Chord" class,
- *	it inherits from the Chord abstract class and implements
- *	it's abstract methods.
- */
-
 #ifndef CHORDNODE_H
 #define CHORDNODE_H
 
@@ -19,7 +8,6 @@
 #include <map>
 #include <vector>
 #include <ctime>
-#include "Query.h"
 
 class Stabilization;
 
@@ -80,21 +68,28 @@ public:
         Node* getThisNode() 			{ return thisNode; }    
         string serialize(ChordNode *node);   
         ChordNode* deserialize(string data);
+        
         bool getQueryForHash(string hash,Query *query);
+        Query* getHandledQueryForHash(string hash);
+
+        
         Node* getNodeForIP(string ip);  
         vector<Node*> getPassedQueryForHash(string hash);
         void          addPassedQuery(string hash, vector<Node*> predSucc);
+        void          addHandledQuery(Query *query){this->handledQueries.push_back(query);}
         string                    randomWalk(string key);
         void                    phaseOne(Query *query);
-
+        void getNodeKey(Node *node, Query *query, string &in_key,string &in_iv);
+        
+        string crypt(string plaintext_string, unsigned char *key,unsigned char *iv);
+        string decrypt(string cryptotext_string, unsigned char *key,unsigned char *iv);
+        
         friend class boost::serialization::access;
 
         template<class Archive>
         void serialize(Archive &ar, const unsigned int version){ar & fingerTable;}
        
         string send_request_with_timeout(Node *selectedNode,transportCode tr,int noOfSecondsToWait,map<string,string> &queryParams);
-
-         
         
         pthread_mutex_t calculating = PTHREAD_MUTEX_INITIALIZER; 
         pthread_cond_t done = PTHREAD_COND_INITIALIZER;
@@ -103,7 +98,6 @@ public:
         char* itoa(int num,char* str,int base);
         void  reverse(char str[], int length);
 private:
-
     
         TransportHTTP* transport;
 
@@ -122,8 +116,7 @@ private:
         map<string,vector<Node*>> passedQueries;
         
         time_t startTime; 
-                
-        vector<Query*> allQueries;
-
+        vector<Query*> allQueries;//all my queries
+        vector<Query*> handledQueries;//queries handled and passed 
 };
 #endif

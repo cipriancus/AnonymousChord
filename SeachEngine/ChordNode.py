@@ -1,32 +1,53 @@
 from AnonymousChordClient import AnonymousChordClient
 import time
-import cPickle
+import _pickle as cPickle
 from Helper import Helper
+import os
+
 
 
 class ChordNode():
     def __init__(self, backbone_server_ip):
         self.anonymousChordClient = AnonymousChordClient(backbone_server_ip)
-        self.anonymousChordClient.start_server()
+        # self.anonymousChordClient.start_server()
+
+        os.chdir('../../Desktop/SeachEngine/')
 
         try:
-            self.all_my_jobs = cPickle.load(open("jobs.json", "rb"))
-            self.history = cPickle.load(open("history.json", "rb"))
-            self.all_searched = cPickle.load(open("all_searched.json", "rb"))
+            with open('all_searched.json', 'rb') as handle:
+                self.all_searched=cPickle.load(handle)
+        except:
+            self.all_searched = []
+
+        try:
+            with open('all_my_jobs.json', 'rb') as handle:
+                self.all_my_jobs=cPickle.load(handle)
         except:
             self.all_my_jobs = []
+
+        try:
+            with open('history.json', 'rb') as handle:
+                self.history=cPickle.load(handle)
+        except:
             self.history = []
-            self.all_searched = []
 
         time.sleep(2)
 
     def get(self, key):
-        serialized_job = self.anonymousChordClient.get(key)
-        job = cPickle.loads(serialized_job)
+        serialized_job = str(self.anonymousChordClient.get(key),encoding='UTF-8')
 
-        self.add_job_searched(job)
+        if serialized_job.find('null') ==-1:
 
-        return Helper.serialize_job_title_list([job])
+            job = cPickle.loads(str(serialized_job))
+
+            self.add_job_searched(job)
+            self.save()
+
+            return Helper.serialize_job_list([job])
+
+        else:
+            return '0'
+
 
     def put(self, key, value):
         return self.anonymousChordClient.put(key, value)
@@ -57,6 +78,7 @@ class ChordNode():
 
         if exists == False:
             self.history.append(job)
+        self.save()
 
     def get_history(self):
         return self.history
@@ -72,6 +94,8 @@ class ChordNode():
 
         if exists == False:
             self.history.append()
+            with open('history.json', 'wb') as handle:
+                cPickle.dump(self.history, handle, protocol=cPickle.HIGHEST_PROTOCOL)
 
     def get_job_from_all(self, id):
         for iterator in self.all_searched:
@@ -89,6 +113,8 @@ class ChordNode():
 
         self.put(key, string_job)
         self.all_my_jobs.append(newJob)
+        self.save()
+
 
     def delete_job(self, id):
         for iterator in self.all_my_jobs:
@@ -96,6 +122,7 @@ class ChordNode():
                 key = Helper.calculate_key(iterator)
                 self.delete(key)
                 self.all_my_jobs.remove(iterator)
+        self.save()
 
     def get_job(self, id):
         for iterator in self.all_my_jobs:
@@ -105,12 +132,18 @@ class ChordNode():
     def get_ip(self):
         return self.anonymousChordClient.getIP()
 
-    def __del__(self):
-        open("jobs.json", "wt").write(cPickle.dumps(self.all_my_jobs))
-        open("history.json", "wt").write(cPickle.dumps(self.history))
-        open("all_searched.json", "wt").write(cPickle.dumps(self.all_searched))
+    def save(self):
+        with open('jobs.json', 'wb') as handle:
+            cPickle.dump(self.all_my_jobs, handle)
+
+        with open('all_searched.json', 'wb') as handle:
+            cPickle.dump(self.all_searched, handle)
 
 
 if __name__ == '__main__':
     chord = ChordNode('127.0.0.1')
     chord.put('77', '123')
+
+
+
+

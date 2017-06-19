@@ -1,11 +1,3 @@
-/*
- *  AbstractChord.h
- *  iPhone_p2p_engine
- *
- *  Created by Laurent Vanni & Nicolas Goles Domic, 2010
- *
- */
-
 #ifndef ABSTRACTCHORD_H
 #define ABSTRACTCHORD_H
 

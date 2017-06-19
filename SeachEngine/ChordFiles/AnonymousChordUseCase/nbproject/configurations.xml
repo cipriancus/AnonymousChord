@@ -36,6 +36,9 @@
       </toolsSet>
       <compileType>
         <ccTool>
+          <incDir>
+            <pElem>../../../boost_1_64_0/libs</pElem>
+          </incDir>
           <commandLine>-std=c++11</commandLine>
           <useLinkerLibraries>false</useLinkerLibraries>
         </ccTool>
@@ -56,7 +59,7 @@
               </makeArtifact>
             </linkerLibProjectItem>
           </linkerLibItems>
-          <commandLine>-lpthread -lrt -ldl -lboost_serialization</commandLine>
+          <commandLine>-lpthread -lrt -ldl -lboost_serialization -lboost_system -lboost_filesystem -lboost_thread -ltomcrypt -DLTM_DESC -lcrypto -lcrypt -fno-rtti -lboost_program_options -lboost_thread -lboost_system -lssl -lcrypto -lcurl</commandLine>
         </linkerTool>
         <requiredProjects>
           <makeArtifact PL="../AnonymousChordLibrary"

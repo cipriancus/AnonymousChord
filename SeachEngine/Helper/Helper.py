@@ -1,5 +1,4 @@
-from pxfilter import XssHtml
-
+from Helper.pxfilter import XssHtml
 
 def get_only_characters(string):
     only_numbers = ''

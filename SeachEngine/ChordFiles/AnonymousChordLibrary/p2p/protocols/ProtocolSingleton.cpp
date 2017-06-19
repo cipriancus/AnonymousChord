@@ -1,11 +1,3 @@
-/*
- *  ProtocolSingleton.cpp
- *  P2P_Engine
- *
- *  Created by Laurent Vanni & Nicolas Goles Domic, 2010
- *
- */
-
 #include <cstring>
 
 #include "ProtocolSingleton.h"

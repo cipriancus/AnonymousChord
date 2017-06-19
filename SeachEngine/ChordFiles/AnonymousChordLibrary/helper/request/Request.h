@@ -1,12 +1,3 @@
-/*
- *  Request.h
- *  P2P_Engine
- *
- *  Created by Laurent Vanni & Nicolas Goles Domic, 2010
-
- *
- */
-
 #ifndef REQUEST_H
 #define REQUEST_H
 

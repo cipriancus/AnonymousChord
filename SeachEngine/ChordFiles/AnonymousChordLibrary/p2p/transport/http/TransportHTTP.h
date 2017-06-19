@@ -1,11 +1,3 @@
-/*
- *  TransportHTTP.h
- *  iPhone_p2p_engine
- *
- *  Created by Laurent Vanni & Nicolas Goles Domic, 2010
- *
- */
-
 #ifndef TRANSPORT_HTTP_H
 #define TRANSPORT_HTTP_H
 

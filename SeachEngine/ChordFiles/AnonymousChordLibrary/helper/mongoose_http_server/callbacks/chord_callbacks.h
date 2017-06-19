@@ -1,9 +1,4 @@
 /*
- *  chord_callbacks.h
- *  P2P_Engine
- *
- *  Created by Laurent Vanni & Nicolas Goles Domic, 2010
-
  *
  *	This file contains all the callbacks to effectively handle the Chord Protocol
  *	via the HTTP server.
@@ -67,5 +62,8 @@ void call_chord_getOnlineTime(struct mg_connection *conn,
                 const struct mg_request_info *request_info, void *user_data);
 
 void call_chord_closestnotetokey(struct mg_connection *conn,
+		const struct mg_request_info *request_info, void *user_data);
+
+void call_chord_getquerykey(struct mg_connection *conn,
 		const struct mg_request_info *request_info, void *user_data);
 #endif
