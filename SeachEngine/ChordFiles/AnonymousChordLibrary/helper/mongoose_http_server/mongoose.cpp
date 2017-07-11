@@ -1659,6 +1659,7 @@ mg_free(char *data)
  * Return NULL if the variable not found, or allocated 0-terminated value.
  * It is caller's responsibility to free the returned value.
  */
+#include<curl/curl.h>
 char *
 mg_get_var(const struct mg_connection *conn, const char *name)
 {
@@ -1672,6 +1673,21 @@ mg_get_var(const struct mg_connection *conn, const char *name)
 		v1 = get_var(name, ri->query_string, strlen(ri->query_string));
 	if (ri->post_data_len > 0)
 		v2 = get_var(name, ri->post_data, ri->post_data_len);
+        
+        CURL *curl;
+        CURLcode res;
+
+        curl_global_init(CURL_GLOBAL_SSL);
+
+        curl = curl_easy_init();
+        if(v1!=NULL)
+            v1 = curl_easy_unescape(curl, v1, strlen(v1),NULL);
+        if(v2!=NULL)
+            v2 = curl_easy_unescape(curl, v2, strlen(v2),NULL);
+
+        /* always cleanup */
+        curl_easy_cleanup(curl);
+        curl_global_cleanup();
 
 	/* If they both have queried variable, POST data wins */
 	if (v1 != NULL && v2 != NULL)

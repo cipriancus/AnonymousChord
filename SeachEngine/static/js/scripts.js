@@ -10,16 +10,28 @@ $(document).ready(function () {
         return decodeURIComponent(results[2].replace(/\+/g, " "));
     }
 
-
     var anonymous_flag = false;
+
+    $.ajax({
+            type: "GET",
+            url: "/getAnonymousFlag",
+            contentType: 'application/json;charset=UTF-8',
+            success: function (result) {
+                if (result == 'False') {
+                    anonymous_flag=false;
+                    $('#anonymous-toggle').bootstrapToggle('off');
+                    $('#anonymous_status').replaceWith('<li id=\"anonymous_status\"><a href=\"#\"><span class=\"glyphicon red glyphicon-one-fine-dot\"><\/span>You are not anonymous<\/a><\/li>')
+
+                }else if(result == 'True'){
+                    anonymous_flag=true;
+                    $('#anonymous-toggle').bootstrapToggle('on');
+                    $('#anonymous_status').replaceWith('<li id=\"anonymous_status\"><a href=\"#\"><span class=\"glyphicon glyphicon-one-fine-dot\"><\/span>You are anonymous<\/a><\/li>')
+
+                }
+            }
+        });
+
     var page_load = 1;
-
-    $(function () {
-        if (anonymous_flag == false)
-            $('#anonymous-toggle').bootstrapToggle('off');
-        else $('#anonymous-toggle').bootstrapToggle('on');
-    })
-
 
     if (window.location)
         $.ajax({
@@ -163,6 +175,10 @@ $(document).ready(function () {
                 var index;
 
                 result = result.split('~');
+
+                if(result.length==1){
+                        $('#list_jobs').append('<div class=\"job\" class=\"col-md-12\"><h4>Sorry, no jobs in history<\/h4><\/div>');
+                }
 
                 for (index = 0; index < result.length; ++index) {
                     if (result[index].length > 0) {

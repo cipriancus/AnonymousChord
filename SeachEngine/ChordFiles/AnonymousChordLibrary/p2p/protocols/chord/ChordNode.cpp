@@ -188,7 +188,7 @@ string ChordNode::openData(string search) {
             }
         }
         myfile.close();
-    } else return "null";
+    } else return string("null");
     return data;
 }
 
@@ -237,6 +237,7 @@ string ChordNode::get(string key) {
         return openData(key);
     } else {
         // Find the node responsible for this key
+
         Node *responsible = findSuccessor(hKey);
         // Create a Put request.
         Request *request = new Request(this->getIdentifier(), GET);
@@ -308,10 +309,29 @@ string ChordNode::sendRequest(Request *request, Node* destination) {
     char *response = transport->sendRequest(request, destination);
     // response received
     if (response) {
-        stringstream ss;
-        ss << response;
-        //free(response); // we must free the initial char* response, to avoid leaks.
-        return ss.str();
+        string ss = string(response);
+        return ss;
+    } else {
+        // Fix the broken pointers of the node
+        fixBrokenPointers(destination);
+        // time to fix the chord
+        sleep(1);
+        // The node is completely disconnected of the backbone
+        if (isAlone()) { // there is only one response possible
+            return getThisNode()->toString();
+        }
+        // try again the request with a new destination
+        return sendRequest(request, findSuccessor(destination->getId()));
+    }
+}
+
+/* Forward a message to a peer, the message is in the format: "<IP+PORT>,TRANSPORT_CODE" */
+string ChordNode::sendRequestTimeout(Request *request, Node* destination, int timeout) {
+    char *response = transport->sendRequestTimeout(request, destination, timeout);
+    // response received
+    if (response) {
+        string ss = string(response);
+        return ss;
     } else {
         // Fix the broken pointers of the node
         fixBrokenPointers(destination);
@@ -501,18 +521,42 @@ char* ChordNode::itoa(int num, char* str, int base) {
 #include <openssl/pem.h>
 
 void *contact_node(void *args) {
-    int oldtype;
+    //    int oldtype;
+    //
+    //    contact *contactNodes = (contact*) args;
+    //
+    //    ChordNode *node = contactNodes->node;
+    //    Node *selectedNode = contactNodes->selectedNode;
+    //    map<string, string> queryParams = contactNodes->queryParams;
+    //
+    //    /* allow the thread to be killed at any time */
+    //    pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS, &oldtype);
+    //
+    //    Request *request = new Request(node->getIdentifier(), contactNodes->tr);
+    //
+    //    if (queryParams.size() > 0) {
+    //        map<string, string>::iterator it;
+    //        for (it = queryParams.begin(); it != queryParams.end(); it++) {
+    //            request->addArg((*it).first, (*it).second);
+    //        }
+    //    }
+    //
+    //    string response = node->sendRequest(request, selectedNode); //the serialized finger table from the contacted node
+    //
+    //    pthread_cond_signal(&node->done);
+    //
+    //    if (response.size() != 0) {
+    //        char *responseCh = NULL;
+    //        responseCh = new char[response.size() * sizeof (char)];
+    //        strcpy(responseCh, response.c_str());
+    //        return (void*) responseCh;
+    //    }
+}
 
-    contact *contactNodes = (contact*) args;
+string ChordNode::send_request_with_timeout(Node *selectedNode, transportCode tr, int noOfSecondsToWait, map<string, string> &queryParams) {
+    sleep(random(0, 2)); //wait a no of sec for attack prevention
 
-    ChordNode *node = contactNodes->node;
-    Node *selectedNode = contactNodes->selectedNode;
-    map<string, string> queryParams = contactNodes->queryParams;
-
-    /* allow the thread to be killed at any time */
-    pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS, &oldtype);
-
-    Request *request = new Request(node->getIdentifier(), contactNodes->tr);
+    Request *request = new Request(getIdentifier(), tr);
 
     if (queryParams.size() > 0) {
         map<string, string>::iterator it;
@@ -521,53 +565,7 @@ void *contact_node(void *args) {
         }
     }
 
-    string response = node->sendRequest(request, selectedNode); //the serialized finger table from the contacted node
-
-    pthread_cond_signal(&node->done);
-
-    char *responseCh = (char*) malloc(response.size() * sizeof (char));
-    strcpy(responseCh, response.c_str());
-    return (void*) responseCh;
-}
-
-string ChordNode::send_request_with_timeout(Node *selectedNode, transportCode tr, int noOfSecondsToWait, map<string, string> &queryParams) {
-    struct timespec max_wait;
-    memset(&max_wait, 0, sizeof (max_wait));
-    max_wait.tv_sec = noOfSecondsToWait;
-
-    struct timespec abs_time;
-    pthread_t tid;
-    int err;
-
-    pthread_mutex_lock(&calculating);
-
-    /* pthread cond_timedwait expects an absolute time to wait until */
-    clock_gettime(CLOCK_REALTIME, &abs_time);
-    abs_time.tv_sec += max_wait.tv_sec;
-    abs_time.tv_nsec += max_wait.tv_nsec;
-
-    sleep(random(0, 2)); //wait a no of sec for attack prevention
-
-    contact contactNodes;
-    contactNodes.node = this;
-    contactNodes.selectedNode = selectedNode;
-    contactNodes.tr = tr;
-    contactNodes.queryParams = queryParams;
-
-    pthread_create(&tid, NULL, contact_node, (void*) &contactNodes);
-
-    err = pthread_cond_timedwait(&done, &calculating, &abs_time);
-
-    char * temp;
-
-    if (!err) {
-        pthread_mutex_unlock(&calculating);
-        pthread_join(tid, (void**) &temp);
-        return string(temp);
-    }
-    pthread_cancel(tid);
-    pthread_mutex_unlock(&calculating);
-    return string("failed");
+    return sendRequestTimeout(request, selectedNode, noOfSecondsToWait);
 }
 
 string ChordNode::randomWalk(string key) {
@@ -591,19 +589,35 @@ string ChordNode::randomWalk(string key) {
 
     string last_node_key_str;
     string last_node_iv_str;
-    
-    getNodeKey(query->getSelectedNodes().back(), query, last_node_key_str, last_node_iv_str);
 
-    unsigned char* last_node_key = reinterpret_cast<unsigned char*>((char*)last_node_key_str.c_str());
-    unsigned char* last_node_iv = reinterpret_cast<unsigned char*>((char*)last_node_iv_str.c_str());
+    do {
+        getNodeKey(query->getSelectedNodes().back(), query, last_node_key_str, last_node_iv_str);
+        if (last_node_key_str.size() == 0 || last_node_iv_str.size() == 0) {
+            query->generateNewHash();
+            last_node_iv_str.clear();
+            last_node_key_str.clear();
+        }
+    } while (last_node_iv_str.size() == 0 || last_node_iv_str.size() == 0);
+
+    unsigned char* last_node_key = reinterpret_cast<unsigned char*> ((char*) last_node_key_str.c_str());
+    unsigned char* last_node_iv = reinterpret_cast<unsigned char*> ((char*) last_node_iv_str.c_str());
 
     string second_last_node_key_str;
     string second_last_node_iv_str;
-    
-    getNodeKey(query->getSelectedNodes().back(), query, second_last_node_key_str, second_last_node_key_str);
 
-    unsigned char* second_last_node_key = reinterpret_cast<unsigned char*>((char*)second_last_node_key_str.c_str());
-    unsigned char* second_last_node_iv = reinterpret_cast<unsigned char*>((char*)second_last_node_iv_str.c_str());
+    do {
+        if (query->getL() == 2)
+            getNodeKey(A, query, second_last_node_key_str, second_last_node_iv_str);
+        else
+            getNodeKey(query->getSelectedNodes().back(), query, second_last_node_key_str, second_last_node_key_str);
+        if (second_last_node_iv_str.size() == 0 || second_last_node_key_str.size() == 0) {
+            second_last_node_iv_str.clear();
+            second_last_node_key_str.clear();
+        }
+    } while (second_last_node_iv_str.size() == 0 || second_last_node_key_str.size() == 0);
+
+    unsigned char* second_last_node_key = reinterpret_cast<unsigned char*> ((char*) second_last_node_key_str.c_str());
+    unsigned char* second_last_node_iv = reinterpret_cast<unsigned char*> ((char*) second_last_node_iv_str.c_str());
 
     map<string, string> queryParams;
     queryParams["table"] = tempNode->serialize(tempNode);
@@ -613,21 +627,26 @@ string ChordNode::randomWalk(string key) {
     char buffer[100];
     int l = query->getL();
 
-    queryParams["l"] = crypt(string(itoa(l, buffer, 10)), last_node_key, last_node_iv);
+    queryParams["l"] = string(itoa(l, buffer, 10));
+    //queryParams["l"] = crypt(string(itoa(l, buffer, 10)), last_node_key, last_node_iv);
 
-    queryParams["id"] = crypt(key, last_node_key, last_node_iv);
+    queryParams["id"] =key;
+    //queryParams["id"] = crypt(key, last_node_key, last_node_iv);
 
-    queryParams["enumeration_command"] = crypt(string(P_SINGLETON->getChordNode()->itoa(16, buffer, 10)), second_last_node_key, second_last_node_iv); //16=RANDOMWALKGETKEY
+    queryParams["enumeration_command"] = string(P_SINGLETON->getChordNode()->itoa(16, buffer, 10)); //16=RANDOMWALKGETKEY
+    //queryParams["enumeration_command"] = crypt(string(P_SINGLETON->getChordNode()->itoa(16, buffer, 10)), second_last_node_key, second_last_node_iv);
 
-    queryParams["last_node"] = crypt(query->getSelectedNodes().back()->serializeNode(), second_last_node_key, second_last_node_iv); //What node to contact at end of random walk
+    queryParams["last_node"] = query->getSelectedNodes().back()->serializeNode(); //What node to contact at end of random walk
+    //queryParams["last_node"] = crypt(query->getSelectedNodes().back()->serializeNode(), second_last_node_key, second_last_node_iv); //What node to contact at end of random walk
 
-    string response = decrypt(send_request_with_timeout(A, RANDOMWALKCONTACT, 400, queryParams), last_node_key, last_node_iv); //inside response are NODES or fail
+    string response = send_request_with_timeout(A, RANDOMWALKCONTACT, 400, queryParams);
+
+    //response = decrypt(response, last_node_key, last_node_iv); //inside response are NODES or fail
 
     return response;
 }
 
 void ChordNode::phaseOne(Query *query) {
-    //Faze one
     for (int iterator = 0; iterator < query->getL(); iterator) {
         vector<Node *> currentTable = query->getLastFingerTableEntry();
 
@@ -641,9 +660,11 @@ void ChordNode::phaseOne(Query *query) {
             selectedNode = currentTable[randomNode]; //select the node
 
             //check if it wasn't selected before
-            if (query->hasBeenSelected(selectedNode) == false) {
+            if (query->hasBeenSelected(selectedNode) == false && selectedNode->getIp().compare(this->getThisNode()->getIp()) != 0) {
                 map<string, string> queryParams;
-                serializedTable = send_request_with_timeout(selectedNode, GETFINGERTABLE, 4, queryParams);
+                
+               serializedTable = send_request_with_timeout(selectedNode, GETFINGERTABLE, 4, queryParams);
+
             }
         } while (serializedTable.size() == 0 || serializedTable.compare(string("failed")) == 0);
 
@@ -655,6 +676,22 @@ void ChordNode::phaseOne(Query *query) {
     }//at the end in selectedNodes we will have the chain of nodes
 }
 
+void splice(string &keyIV, string &in_key, string &in_iv) {
+    int parity = 0;
+    for (int iterator = 0; iterator < keyIV.length(); iterator++) {
+        if (keyIV[iterator] == '+') {
+            parity = 1;
+        } else {
+            if (parity == 0) {
+                in_key.push_back(keyIV[iterator]);
+            }
+            if (parity == 1) {
+                in_iv.push_back(keyIV[iterator]);
+            }
+        }
+    }
+}
+
 void ChordNode::getNodeKey(Node *node, Query *query, string &in_key, string &in_iv) {
 
     Request *request = new Request(getIdentifier(), GETQUERYKEY);
@@ -663,11 +700,15 @@ void ChordNode::getNodeKey(Node *node, Query *query, string &in_key, string &in_
     char buffer[100];
     request->addArg("l", itoa(query->getL(), buffer, 10));
 
-    string response = sendRequest(request, node);
+    int times = 0;
+    string response;
+    do {
+        response = sendRequest(request, node);
+        times++;
 
+    } while ((response.size() == 0 || response.compare("fail") == 0) && times != 3);
 
-    in_key = response.substr(0, 16);
-    in_iv = response.substr(17, response.npos);
+    splice(response, in_key, in_iv); //cut the resturn string,  xxxx+xxxx into key and iv
 }
 
 string ChordNode::crypt(string plaintext_string, unsigned char *key, unsigned char *iv) {

@@ -18,6 +18,7 @@
 #include <cstring>
 #include <arpa/inet.h>
 #include <fcntl.h>
+#include <openssl/ssl.h>
 
 using namespace std;
 
@@ -28,7 +29,7 @@ ChordNode *chord = NULL;
 #define PORT 5757
 
 /* codul de eroare returnat de anumite apeluri */
-extern int errno;
+    extern int errno;
 
 void handle_sigchld(int sig) {
     while (waitpid((-1), 0, WNOHANG) > 0);
@@ -121,8 +122,6 @@ int main(int argc, char * const argv[]) {
 }
 
 void child(int client, char * const argv[]) {
-
-    while (1) {
 
         char comanda[100];
         char key[1100];
@@ -225,6 +224,6 @@ void child(int client, char * const argv[]) {
                 perror("[server]Eroare la write() catre client.\n");
                 return;
             }
-        }
+        close(client);
     }
 }

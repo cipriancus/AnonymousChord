@@ -16,23 +16,15 @@ Query::Query(int l) {
 
     generateKey();
 
-    int number = random();
-    char no[100];
-    //current hash for this query
-    sha1->addBytes(reinterpret_cast<const char*> (itoa(number, no, 10)), strlen(itoa(number, no, 10)));
-    this->queryHash = string(reinterpret_cast<const char*> (sha1->getDigest()));
+    
 }
 
-Query::Query(int l,string hash) {
+Query::Query(int l,string hash,string ip) {
     this->l = l;
-
+    this->owner_ip=ip;
     generateKey();
 
-    int number = random();
-    char no[100];
-    //current hash for this query
-    sha1->addBytes(reinterpret_cast<const char*> (itoa(number, no, 10)), strlen(itoa(number, no, 10)));    
-    queryHash=hash;
+    generateNewHash();
 }
 
 Query::Query(int min, int max) {
@@ -40,15 +32,19 @@ Query::Query(int min, int max) {
 
     generateKey();
 
+    generateNewHash();
+}
+
+Query::~Query() {
+    delete sha1;
+}
+
+void Query::generateNewHash(){
     int number = random();
     char no[100];
     //current hash for this query
     sha1->addBytes(reinterpret_cast<const char*> (itoa(number, no, 10)), strlen(itoa(number, no, 10)));
     this->queryHash = string(reinterpret_cast<const char*> (sha1->getDigest()));
-}
-
-Query::~Query() {
-    delete sha1;
 }
 
 void Query::generateKey() {

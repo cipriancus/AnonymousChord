@@ -21,7 +21,7 @@ void AbstractChord::initialise(string ip, int id, int port) {
     successor = thisNode;
     predecessor = thisNode;
     next = 0; // C++ we have to set next to zero to avoid possible garbage...
-    timeToCheck = 250; // miliSecond
+    timeToCheck = 2000; // miliSecond
 
     for (int i = 0; i < spacesize; i++) {
         fingerTable.push_back(thisNode);

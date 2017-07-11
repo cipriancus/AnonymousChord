@@ -6,10 +6,8 @@
 #include <curl/curl.h>
 #include <stdio.h>
 #include <sstream>
-
-char* process_http(char *host, char *page, char *poststr) {
-
-}
+#include<string>
+using namespace std;
 
 size_t write_to_string(void *ptr, size_t size, size_t count, void *stream) {
     ((std::string*) stream)->append((char*) ptr, 0, size * count);
@@ -17,25 +15,26 @@ size_t write_to_string(void *ptr, size_t size, size_t count, void *stream) {
 }
 
 char* sendPost(char *hostName, int port, char *page, char *postString) {
-
     signal(SIGPIPE, SIG_IGN);
 
     CURL *curl;
     CURLcode res;
 
-    curl_global_init(CURL_GLOBAL_ALL);
+    curl_global_init(CURL_GLOBAL_SSL);
 
     curl = curl_easy_init();
+           
+    std::ostringstream oss;
+    oss << "https://" << hostName << page;
+
+    std::string request = oss.str();
+      
     if (curl) {
-        std::ostringstream oss;
-        oss << "https://" << hostName << page;
-
-        std::string request = oss.str();
-
-        curl_easy_setopt(curl, CURLOPT_URL, oss.str().c_str());
+        curl_easy_setopt(curl, CURLOPT_URL, request.c_str());
         curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0L);
         curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 0L);
-
+        curl_easy_setopt(curl, CURLOPT_NOSIGNAL, (long) 1);
+        
         std::string response;
         curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, write_to_string);
         curl_easy_setopt(curl, CURLOPT_WRITEDATA, &response);
@@ -44,14 +43,78 @@ char* sendPost(char *hostName, int port, char *page, char *postString) {
         /* Perform the request, res will get the return code */
         res = curl_easy_perform(curl);
         /* Check for errors */
-        if (res != CURLE_OK)
+
+        if (res == CURLE_URL_MALFORMAT) {
+            curl_easy_cleanup(curl);
+            curl_global_cleanup();
+            return (char*) "malformed";
+        }
+
+        if (res != CURLE_OK && res != CURLE_GOT_NOTHING)
             fprintf(stderr, "curl_easy_perform() failed: %s\n",
                 curl_easy_strerror(res));
 
         /* always cleanup */
         curl_easy_cleanup(curl);
         curl_global_cleanup();
-        return (char*) response.c_str();
+
+        if (res == CURLE_OK) {
+            return (char*) response.c_str();
+        }
+
+        return (char*) "fail";
+    }
+}
+
+char* sendPost_timeout(char *hostName, int port, char *page, char *postString,int timeout) {
+    signal(SIGPIPE, SIG_IGN);
+
+    CURL *curl;
+    CURLcode res;
+
+    curl_global_init(CURL_GLOBAL_SSL);
+
+    curl = curl_easy_init();
+           
+    std::ostringstream oss;
+    oss << "https://" << hostName << page;
+
+    std::string request = oss.str();
+      
+    if (curl) {
+        curl_easy_setopt(curl, CURLOPT_URL, request.c_str());
+        curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0L);
+        curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 0L);
+//        curl_easy_setopt(curl, CURLOPT_NOSIGNAL, (long) 1);
+        curl_easy_setopt(curl, CURLOPT_TIMEOUT,(long)timeout);
+        std::string response;
+        curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, write_to_string);
+        curl_easy_setopt(curl, CURLOPT_WRITEDATA, &response);
+
+
+        /* Perform the request, res will get the return code */
+        res = curl_easy_perform(curl);
+        /* Check for errors */
+
+        if (res == CURLE_URL_MALFORMAT) {
+            curl_easy_cleanup(curl);
+            curl_global_cleanup();
+            return (char*) "malformed";
+        }
+
+        if (res != CURLE_OK && res != CURLE_GOT_NOTHING)
+            fprintf(stderr, "curl_easy_perform() failed: %s\n",
+                curl_easy_strerror(res));
+
+        /* always cleanup */
+        curl_easy_cleanup(curl);
+        curl_global_cleanup();
+
+        if (res == CURLE_OK) {
+            return (char*) response.c_str();
+        }
+
+        return (char*) "fail";
     }
 }
 

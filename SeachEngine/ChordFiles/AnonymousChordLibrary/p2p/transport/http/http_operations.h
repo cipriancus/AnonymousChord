@@ -45,5 +45,7 @@ char* getLocalIp();
 
 int getPostMessage(char *message);
 
+char* sendPost_timeout(char *hostName, int port, char *page, char *postString,int timeout) ;
+
 #endif
 

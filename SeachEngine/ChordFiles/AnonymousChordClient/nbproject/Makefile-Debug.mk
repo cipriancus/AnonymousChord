@@ -52,23 +52,26 @@ FFLAGS=
 ASFLAGS=
 
 # Link Libraries and Options
-LDLIBSOPTIONS=
+LDLIBSOPTIONS=../AnonymousChordLibrary/dist/Debug/GNU-Linux/libanonymouschordlibrary.a
 
 # Build Targets
 .build-conf: ${BUILD_SUBPROJECTS}
 	"${MAKE}"  -f nbproject/Makefile-${CND_CONF}.mk ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/anonymouschordclient
 
+${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/anonymouschordclient: ../AnonymousChordLibrary/dist/Debug/GNU-Linux/libanonymouschordlibrary.a
+
 ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/anonymouschordclient: ${OBJECTFILES}
 	${MKDIR} -p ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}
-	${LINK.cc} -o ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/anonymouschordclient ${OBJECTFILES} ${LDLIBSOPTIONS}
+	${LINK.cc} -o ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/anonymouschordclient ${OBJECTFILES} ${LDLIBSOPTIONS} -lpthread -lrt -ldl -lboost_serialization -lboost_system -lboost_filesystem -lboost_thread -ltomcrypt -DLTM_DESC -lcrypto -lcrypt -fno-rtti -lboost_program_options -lboost_thread -lboost_system -lcurl -lssl -lcrypto
 
 ${OBJECTDIR}/main.o: main.cpp
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
-	$(COMPILE.cc) -g -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/main.o main.cpp
+	$(COMPILE.cc) -g -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/main.o main.cpp
 
 # Subprojects
 .build-subprojects:
+	cd ../AnonymousChordLibrary && ${MAKE}  -f Makefile CONF=Debug
 
 # Clean Targets
 .clean-conf: ${CLEAN_SUBPROJECTS}
@@ -76,6 +79,7 @@ ${OBJECTDIR}/main.o: main.cpp
 
 # Subprojects
 .clean-subprojects:
+	cd ../AnonymousChordLibrary && ${MAKE}  -f Makefile CONF=Debug clean
 
 # Enable dependency checking
 .dep.inc: .depcheck-impl

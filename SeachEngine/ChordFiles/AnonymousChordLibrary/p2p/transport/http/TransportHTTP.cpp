@@ -121,6 +121,17 @@ char* TransportHTTP::sendRequest(Request *request, Node *destination) {
             (char *) ""); //for now the POST content is empty.
 }
 
+char* TransportHTTP::sendRequestTimeout(Request *request, Node *destination,int timeout) {
+    /*
+     *	We should send our POST to the destination, their callback function,
+     *	must manage it accordingly, and the callback that we choose must be passed
+     *	via the callback argument of this function.
+     */
+    return sendPost_timeout((char *) (destination->getIp()).c_str(),
+            destination->getPort(), (char *) request->serialize().c_str(),
+            (char *) "",timeout); //for now the POST content is empty.
+}
+
 /*
  *	Since the tracker can only present HTML responses (for now) and not tweak
  *	the response like mongoose can ( and respond only what we need ). We should

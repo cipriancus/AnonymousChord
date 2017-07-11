@@ -17,7 +17,7 @@ from struct import pack
 class AnonymousChordClient():
     def __init__(self, backbone_server_ip):
         self.backbone_server_ip = backbone_server_ip
-        self.port = '8000'
+        self.port = '443'
         self.overlay = 'AnonymousChord'
         self.my_ip = self.getIP()
 
@@ -47,9 +47,8 @@ class AnonymousChordClient():
         data = pack('!%ds' % 1100, bytes(key,encoding='UTF-8'))
         s.send(bytes(data))
         response = s.recv(5100)
-        response = str(response)
         s.close()
-        return response
+        return Helper.insert_null(response)
 
     def put(self, key, value):
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -58,7 +57,7 @@ class AnonymousChordClient():
         s.send(bytes(data))
         data = pack('!%ds' % 1100, bytes(key,encoding='UTF-8'))
         s.send(bytes(data))
-        data = pack('!%ds' % 5100, value)
+        data = pack('!%ds' % 5100, Helper.remove_null(value))
         s.send(bytes(data))
 
     def get_connected_nodes(self):
@@ -66,10 +65,10 @@ class AnonymousChordClient():
         s.connect((self.server_ip, self.server_port))
         s.send(bytes(b'getallnodes'))
         no_of_ch = s.recv(8)
-        no_of_ch = int(Helper.get_only_characters(no_of_ch))
+        no_of_ch = int(Helper.get_only_characters(str(no_of_ch,encoding='UTF-8')))
         all_nodes = s.recv(no_of_ch)
         s.close()
-        return str(all_nodes)
+        return str(all_nodes,encoding='UTF-8')
 
     def delete(self, key):
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -81,7 +80,15 @@ class AnonymousChordClient():
         s.close()
 
     def anonymous_get(self, key):
-        return ''
+        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        s.connect((self.server_ip, self.server_port))
+        data = pack('!%ds' % 100, b'randomWalk')
+        s.send(bytes(data))
+        data = pack('!%ds' % 1100, bytes(key,encoding='UTF-8'))
+        s.send(bytes(data))
+        response = s.recv(5100)
+        s.close()
+        return Helper.insert_null(response)
 
     def exit(self):
         self.s.send(bytes(b'exit'))

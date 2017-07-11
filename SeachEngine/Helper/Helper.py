@@ -59,3 +59,24 @@ def xss_parse(list):
         return_list.append(parser.getHtml())
 
     return return_list
+
+def remove_null(string):
+    return_string=bytearray()
+    for iterator in range(0,len(string)):
+        if string[iterator]==0:
+            return_string.append(17)
+        else:
+            return_string.append(string[iterator])
+    return return_string
+
+def insert_null(string):
+    return_string=bytearray()
+    for iterator in range(0,len(string)):
+        if string[iterator]==17:
+            return_string.append(0)
+        elif string[iterator]==0:
+            break
+        else:
+            return_string.append(string[iterator])
+
+    return return_string

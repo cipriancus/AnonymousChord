@@ -7,7 +7,16 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="2"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
+            <file>file:/home/ciprian/Desktop/SeachEngine/ChordFiles/AnonymousChordLibrary/helper/thread/FixFinger.h</file>
+            <file>file:/home/ciprian/Desktop/SeachEngine/ChordFiles/AnonymousChordLibrary/helper/thread/Thread.h</file>
+            <file>file:/home/ciprian/Desktop/SeachEngine/ChordFiles/AnonymousChordLibrary/helper/thread/CheckPred.h</file>
+            <file>file:/home/ciprian/Desktop/SeachEngine/ChordFiles/AnonymousChordLibrary/helper/mongoose_http_server/mongoose.cpp</file>
             <file>file:/home/ciprian/Desktop/SeachEngine/ChordFiles/AnonymousChordLibrary/helper/mongoose_http_server/callbacks/chord_callbacks.cpp</file>
+            <file>file:/home/ciprian/Desktop/SeachEngine/ChordFiles/AnonymousChordLibrary/helper/thread/Thread.cpp</file>
+            <file>file:/home/ciprian/Desktop/SeachEngine/ChordFiles/AnonymousChordLibrary/helper/thread/Exception.h</file>
+            <file>file:/home/ciprian/Desktop/SeachEngine/ChordFiles/AnonymousChordLibrary/p2p/transport/http/http_operations.cpp</file>
+            <file>file:/home/ciprian/Desktop/SeachEngine/ChordFiles/AnonymousChordLibrary/helper/thread/Stabilization.h</file>
+            <file>file:/home/ciprian/Desktop/SeachEngine/ChordFiles/AnonymousChordLibrary/helper/request/Request.cpp</file>
             <file>file:/home/ciprian/Desktop/SeachEngine/ChordFiles/AnonymousChordLibrary/p2p/protocols/chord/ChordNode.cpp</file>
         </group>
     </open-files>

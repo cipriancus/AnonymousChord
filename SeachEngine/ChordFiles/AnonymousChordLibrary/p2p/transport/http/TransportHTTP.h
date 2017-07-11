@@ -17,6 +17,7 @@ public:
 
 	//API methods
 	char* sendRequest(Request *request, Node *destination);
+        char* sendRequestTimeout(Request *request, Node *destination,int timeout);
 	string sendTrackerRequest(const string &host, int port,
 			const string &callback);
 	string doStuff(const string &code);

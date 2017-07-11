@@ -26,7 +26,7 @@ using namespace std;
 class Query {
 public:
     Query();
-    Query(int l,string hash);
+    Query(int l,string hash,string ip);
     Query(int l);
     Query(int min, int max);
     virtual ~Query();
@@ -48,6 +48,8 @@ public:
     list<vector<Node *>> getAllSelectedFingerTables() {
         return selectedFingerTables;
     }
+    
+    void generateNewHash();
 
     vector<Node*> getSelectedNodes() {
         return selectedNodes;
@@ -77,6 +79,8 @@ public:
     vector<Node *> getLastFingerTableEntry() {
         return selectedFingerTables.back();
     }
+    
+    void generateKey();
 
 private:
     #define P_SINGLETON ProtocolSingleton::getInstance()
@@ -87,7 +91,6 @@ private:
     char* itoa(int num, char* str, int base);
     void reverse(char str[], int length);
 
-    void generateKey();
         
     string queryHash;
     

@@ -107,7 +107,7 @@ body {
 }
 
 .loader {
-    margin-top: 5%;
+    margin-top: 15%;
     border: 16px solid #f3f3f3; /* Light grey */
     border-top: 16px solid #3498db; /* Blue */
     border-radius: 50%;
@@ -173,4 +173,6 @@ body {
 
 .job{
     border:1px dotted #000;
+    margin-top: 2%;
+    margin-bottom: 2%;
 }

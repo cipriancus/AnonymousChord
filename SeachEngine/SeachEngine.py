@@ -70,10 +70,8 @@ def delete_job():
 
 @app.route('/getnodes', methods=['GET'])
 def get_nodes():
-    # global chordNode
-    # return chordNode.get_connected_nodes()
-    return 'ok'
-
+        global chordNode
+        return chordNode.get_connected_nodes()
 
 @app.route('/search', methods=['POST'])
 def search():
@@ -161,6 +159,9 @@ def get_history():
 
     return Helper.serialize_job_title_list(chordNode.get_history())
 
+@app.route('/getAnonymousFlag', methods=['GET'])
+def getAnonymousFlag():
+    return str(anonymousFlag)
 import ssl
 context=ssl.SSLContext(ssl.PROTOCOL_TLSv1_2)
 context.load_cert_chain('certificate.crt', 'private.key')

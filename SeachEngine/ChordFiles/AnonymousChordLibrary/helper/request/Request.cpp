@@ -1,5 +1,6 @@
 #include "Request.h"
 #include "ChordTransportCode.h"
+#include <curl/curl.h>
 
 /* Constructor */
 Request::Request(string overlayID, int code) {
@@ -9,10 +10,20 @@ Request::Request(string overlayID, int code) {
 
 /* Adds an arument to the Request arguments Map. */
 void Request::addArg(string key, string value) {
-    for (size_t pos = value.find(' '); pos != string::npos; pos = value.find(' ', pos)) {
-        value.replace(pos, 1, "%20");
-    }
-    arguments.insert(arg(key, value));
+
+    CURL *curl;
+    CURLcode res;
+
+    curl_global_init(CURL_GLOBAL_SSL);
+
+    curl = curl_easy_init();
+    char *output = curl_easy_escape(curl, value.c_str(), value.length());
+  
+    arguments.insert(arg(key, string(output)));
+
+    /* always cleanup */
+    curl_easy_cleanup(curl);
+    curl_global_cleanup();
 }
 
 /* Request an argument to the request arguments Map. */

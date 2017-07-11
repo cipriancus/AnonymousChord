@@ -161,38 +161,6 @@ void call_chord_closestnotetokey(struct mg_connection *conn,
     mg_free(id);
 }
 
-#include<openssl/bio.h>
-
-void call_chord_getquerykey(struct mg_connection *conn,
-        const struct mg_request_info *request_info, void *user_data) {
-
-    string query_hash = string(mg_get_var(conn, "query_hash"));
-    string l = string(mg_get_var(conn, "l"));
-
-    ChordNode *chord = P_SINGLETON->getChordNode();
-
-    Query *query = chord->getHandledQueryForHash(query_hash); //see if query exists
-    //if exists ask for ip to see if owner
-    if (query != NULL) {
-        if (query->getOwnerIP().compare(returnIP(conn)) == 0) {//is owner
-            string response = query->getPublicKey() + string("+") + query->getIV();
-
-            mg_printf(conn, response.c_str());
-        } else {//not owner
-            mg_printf(conn, "null");
-        }
-    } else {//does not exist, create query and give key
-        Query *query = new Query(atoi(l.c_str()), query_hash);
-        const char *ip = returnIP(conn);
-        query->setOwnerIP(string(ip));
-        chord->addHandledQuery(query);
-
-        string response = query->getPublicKey() + string("+") + query->getIV();
-
-        mg_printf(conn, response.c_str());
-    }
-}
-
 void call_chord_getfingertable(struct mg_connection *conn,
         const struct mg_request_info *request_info, void *user_data) {
 
@@ -286,6 +254,42 @@ void call_chord_getNewNode(struct mg_connection *conn,
     //        }
 }
 
+#include<openssl/bio.h>
+
+void call_chord_getquerykey(struct mg_connection *conn,
+        const struct mg_request_info *request_info, void *user_data) {
+
+    string query_hash = string(mg_get_var(conn, "query_hash"));
+    string l = string(mg_get_var(conn, "l"));
+
+    ChordNode *chord = P_SINGLETON->getChordNode();
+
+    Query *query = chord->getHandledQueryForHash(query_hash); //see if query exists
+    //if exists ask for ip to see if owner
+    if (query != NULL) {
+        if (query->getOwnerIP().compare(returnIP(conn)) == 0) {//is owner
+            string response = query->getPublicKey() + string("+") + query->getIV();
+
+            mg_printf(conn, response.c_str());
+        } else {//not owner
+            mg_printf(conn, "null");
+        }
+    } else {//does not exist, create query and give key
+        const char *ip = returnIP(conn);
+
+        Query *query = new Query(atoi(l.c_str()), query_hash,string(ip));
+        chord->addHandledQuery(query);
+
+        while(query->getPublicKey().size()==0||query->getIV().size()==0){
+            query->generateKey();
+        }
+        
+        string response = query->getPublicKey() + string("+") + query->getIV();
+
+        mg_printf(conn, response.c_str());
+    }
+}
+
 void call_chord_contact(struct mg_connection *conn,
         const struct mg_request_info *request_info, void *user_data) {
 
@@ -364,6 +368,11 @@ void call_chord_contact(struct mg_connection *conn,
     } else {
         //e ultimul nod selectat
         //ii cer sa initieze ceea ce scrie in enumeration_command
+            Query *query=tempNode->getHandledQueryForHash(hash);
+        enumcommand=tempNode->decrypt(enumcommand,reinterpret_cast<unsigned char*>((char*)query->getPublicKey().c_str()),reinterpret_cast<unsigned char*>((char*)query->getPublicKey().c_str()));
+        last_node=tempNode->decrypt(last_node,reinterpret_cast<unsigned char*>((char*)query->getPublicKey().c_str()),reinterpret_cast<unsigned char*>((char*)query->getPublicKey().c_str()));
+        
+        
         Node *contact = new Node();
         contact = contact->deserializeNode(last_node);
 
@@ -373,10 +382,6 @@ void call_chord_contact(struct mg_connection *conn,
         query_params["l"] = l;
         query_params["id"] = key;
        
-        Query *query=tempNode->getHandledQueryForHash(hash);
-        enumcommand=tempNode->decrypt(enumcommand,reinterpret_cast<unsigned char*>((char*)query->getPublicKey().c_str()),reinterpret_cast<unsigned char*>((char*)query->getPublicKey().c_str()));
-        last_node=tempNode->decrypt(last_node,reinterpret_cast<unsigned char*>((char*)query->getPublicKey().c_str()),reinterpret_cast<unsigned char*>((char*)query->getPublicKey().c_str()));
-                
         char *buffer;
 
         int times = 0;
@@ -502,7 +507,9 @@ void call_chord_getkey(struct mg_connection *conn,
                 break;
             }
         } while (1);
-    }
+    }  
+    response=tempNode->crypt(response,reinterpret_cast<unsigned char*>((char*)query->getPublicKey().c_str()),reinterpret_cast<unsigned char*>((char*)query->getPublicKey().c_str()));
+    
     mg_printf(conn, response.c_str());
 
     mg_free(tablech);
