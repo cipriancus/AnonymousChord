@@ -1,5 +1,13 @@
-# AnonymousChord
+#WormNET
 
-Anonymous P2P network for Cusmuliuc Cipran's Bachelor's degree
+P2P network based on the Chord protocol.
 
-Drive : https://drive.google.com/drive/folders/0B_jRMRTB7_hgcVV2ZDZnRGF4Mnc?usp=sharing
+Mail goal is the hiding of the users identity by creating random walks in the network.
+
+The overlay use-case is a job search engine for users that want to change jobs securely.
+
+Special thank to :
+
+Laurent Vanni & Nicolas Goles Domic for the implementation of Chord, it helped me save a lot of time by not starting from scratch:
+https://github.com/Goles/cChord
+
