@@ -2,7 +2,7 @@
 
 P2P network based on the Chord protocol.
 
-Mail goal is the hiding of the users identity by creating random walks in the network.
+Main goal is the hiding of the users identity by creating random walks in the network.
 
 The overlay use-case is a job search engine for users that want to change jobs securely.
 
